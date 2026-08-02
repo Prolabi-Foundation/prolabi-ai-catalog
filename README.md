@@ -2,7 +2,7 @@
 
 Public operational repository for Prolabi's signed provider-model catalog. It contains publication policy, verification tooling, CI, and runbooks. It intentionally contains **no production catalog, provider credential, or signing key**.
 
-Prolabi Desktop is the authority for the catalog schema and publication rules. This repository pins an exact Desktop commit in [`policy/catalog-policy.json`](policy/catalog-policy.json), builds that consumer in CI, and asks it to validate a synthetic payload. Schema logic is not copied here.
+Prolabi Desktop is the authority for the catalog schema and publication rules. This repository pins an exact Desktop authority in [`policy/catalog-policy.json`](policy/catalog-policy.json), while Desktop's private CI checks out this public repository and validates a synthetic payload. This direction avoids granting a public workflow access to the private product repository, and schema logic is not copied here.
 
 ## Current state
 
@@ -27,7 +27,7 @@ node scripts/generate-synthetic-payload.mjs --output D:\catalog-work\catalog.pay
 node scripts/validate-with-desktop.mjs --desktop-dir D:\src\prolabi-desktop --payload D:\catalog-work\catalog.payload.json
 ```
 
-The consumer checkout must be exactly the commit recorded by policy. Update that pin only through a reviewed PR after confirming compatibility.
+The consumer checkout must be the pinned commit or a descendant that has not changed any allowlisted catalog-authority path. Update the pin and review the authority diff whenever one of those paths changes.
 
 ## Publication boundary
 

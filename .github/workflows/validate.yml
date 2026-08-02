@@ -19,12 +19,12 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Check out catalog operations
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           persist-credentials: false
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -34,32 +34,3 @@ jobs:
 
       - name: Validate repository policy and tooling
         run: npm test
-
-      - name: Resolve pinned consumer
-        id: policy
-        run: node scripts/ci-policy-output.mjs
-
-      - name: Check out pinned Desktop consumer
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ steps.policy.outputs.consumer_repository }}
-          ref: ${{ steps.policy.outputs.consumer_commit }}
-          path: .consumer/prolabi-desktop
-          persist-credentials: false
-
-      - name: Install Desktop dependencies
-        working-directory: .consumer/prolabi-desktop/desktop
-        run: npm ci
-
-      - name: Build canonical Desktop validator
-        working-directory: .consumer/prolabi-desktop/desktop
-        run: npm run build
-
-      - name: Generate synthetic contract fixture
-        run: node scripts/generate-synthetic-payload.mjs --output "$RUNNER_TEMP/catalog.payload.json"
-
-      - name: Validate with pinned Desktop consumer
-        run: >-
-          node scripts/validate-with-desktop.mjs
-          --desktop-dir "$GITHUB_WORKSPACE/.consumer/prolabi-desktop"
-          --payload "$RUNNER_TEMP/catalog.payload.json"

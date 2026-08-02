@@ -14,6 +14,15 @@ const POLICY_KEYS = [
   'release',
   'repository',
 ];
+const CONSUMER_AUTHORITY_PATHS = [
+  'desktop/scripts/provider-catalog.mjs',
+  'desktop/src/canonicalJson.ts',
+  'desktop/src/jsonContract.ts',
+  'desktop/src/providerCatalogPublication.ts',
+  'desktop/src/providerModelCatalog.ts',
+  'desktop/src/semanticVersion.ts',
+  'desktop/src/signedCatalog.ts',
+];
 
 export function loadPolicy() {
   const path = resolve(REPOSITORY_ROOT, 'policy', 'catalog-policy.json');
@@ -24,15 +33,20 @@ export function loadPolicy() {
     value.format_version !== 1 ||
     value.repository !== 'Prolabi-Foundation/prolabi-ai-catalog' ||
     !hasExactKeys(value.consumer, [
+      'authority_paths',
       'commit',
       'node_version',
       'repository',
+      'validation_mode',
       'validator',
     ]) ||
     value.consumer.repository !== 'Prolabi-Foundation/prolabi-desktop' ||
     !/^[0-9a-f]{40}$/u.test(value.consumer.commit) ||
     !/^\d+\.\d+\.\d+$/u.test(value.consumer.node_version) ||
+    value.consumer.validation_mode !== 'pinned-or-authority-equivalent' ||
     value.consumer.validator !== 'desktop/scripts/provider-catalog.mjs' ||
+    JSON.stringify(value.consumer.authority_paths) !==
+      JSON.stringify(CONSUMER_AUTHORITY_PATHS) ||
     !hasExactKeys(value.publication, [
       'allow_catalog_payloads_in_git',
       'allow_private_keys_in_git_or_ci',

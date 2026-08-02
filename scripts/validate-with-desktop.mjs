@@ -23,12 +23,13 @@ const compiledValidatorDependency = resolve(
   'providerCatalogPublication.js',
 );
 
-assertCommand(
-  'git',
-  ['-C', desktopRoot, 'rev-parse', 'HEAD'],
-  policy.consumer.commit,
-  'Desktop checkout does not match the pinned consumer commit.',
-);
+const desktopCommit = commandOutput('git', [
+  '-C',
+  desktopRoot,
+  'rev-parse',
+  'HEAD',
+]);
+assertConsumerAuthority(desktopCommit);
 if (!existsSync(validatorPath) || !existsSync(compiledValidatorDependency)) {
   throw new Error('Desktop must be built before consumer validation.');
 }
@@ -43,9 +44,46 @@ if (validation.status !== 0) {
 }
 process.stdout.write(validation.stdout);
 
-function assertCommand(command, args, expected, message) {
-  const result = spawnSync(command, args, { encoding: 'utf8' });
-  if (result.status !== 0 || result.stdout.trim() !== expected) {
-    throw new Error(message);
+function assertConsumerAuthority(desktopCommit) {
+  if (desktopCommit === policy.consumer.commit) {
+    return;
   }
+  const ancestry = spawnSync(
+    'git',
+    [
+      '-C',
+      desktopRoot,
+      'merge-base',
+      '--is-ancestor',
+      policy.consumer.commit,
+      desktopCommit,
+    ],
+    { encoding: 'utf8' },
+  );
+  const authorityDiff = spawnSync(
+    'git',
+    [
+      '-C',
+      desktopRoot,
+      'diff',
+      '--quiet',
+      `${policy.consumer.commit}..${desktopCommit}`,
+      '--',
+      ...policy.consumer.authority_paths,
+    ],
+    { encoding: 'utf8' },
+  );
+  if (ancestry.status !== 0 || authorityDiff.status !== 0) {
+    throw new Error(
+      'Desktop changed catalog authority after the pinned consumer commit.',
+    );
+  }
+}
+
+function commandOutput(command, args) {
+  const result = spawnSync(command, args, { encoding: 'utf8' });
+  if (result.status !== 0 || result.stdout.trim().length === 0) {
+    throw new Error('Desktop source identity could not be resolved.');
+  }
+  return result.stdout.trim();
 }

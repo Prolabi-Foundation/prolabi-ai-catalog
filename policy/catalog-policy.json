@@ -1,8 +1,18 @@
 {
   "consumer": {
+    "authority_paths": [
+      "desktop/scripts/provider-catalog.mjs",
+      "desktop/src/canonicalJson.ts",
+      "desktop/src/jsonContract.ts",
+      "desktop/src/providerCatalogPublication.ts",
+      "desktop/src/providerModelCatalog.ts",
+      "desktop/src/semanticVersion.ts",
+      "desktop/src/signedCatalog.ts"
+    ],
     "commit": "c10cc935c6575ef73ed1ea596cdd3e8e4a35373b",
     "node_version": "24.14.0",
     "repository": "Prolabi-Foundation/prolabi-desktop",
+    "validation_mode": "pinned-or-authority-equivalent",
     "validator": "desktop/scripts/provider-catalog.mjs"
   },
   "format": "prolabi-provider-catalog-repository-policy",

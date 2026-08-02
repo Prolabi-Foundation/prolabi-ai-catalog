@@ -16,7 +16,7 @@ Do not commit:
 
 1. Branch from protected `main` and keep the change narrowly scoped.
 2. Run `npm ci` and `npm test`.
-3. Confirm CI validates a synthetic payload against the pinned Desktop commit.
+3. Confirm public CI passes and the private Desktop CI validates a synthetic payload from the exact catalog-operations commit.
 4. Obtain two independent approvals for policy, consumer-pin, release, or trust-boundary changes.
 5. Merge only with required checks green and without administrator bypass.
 

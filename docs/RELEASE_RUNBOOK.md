@@ -20,7 +20,7 @@ Perform the active/recovery Ed25519 ceremony described by Prolabi Desktop's `doc
 
 Add only reviewed public-key records to Desktop. The recovery key must be trusted but must not sign ordinary releases. Merge and verify the Desktop change before updating `consumer.commit` here to that exact commit.
 
-CI must remain green after the consumer pin changes. A green synthetic contract test proves schema compatibility; it does not prove a production key or release.
+Public CI must remain green after the consumer pin changes, and Desktop's private CI must validate the synthetic payload from the reviewed catalog-operations commit. The public workflow never receives credentials for the private product repository. A green synthetic contract test proves schema compatibility; it does not prove a production key or release.
 
 ## 3. Prepare release data outside Git
 

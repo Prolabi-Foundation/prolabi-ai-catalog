@@ -10,6 +10,8 @@ import { loadPolicy, REPOSITORY_ROOT } from '../scripts/lib/contracts.mjs';
 test('policy pins the canonical Desktop consumer and fail-closed release shape', () => {
   const policy = loadPolicy();
   assert.equal(policy.consumer.commit.length, 40);
+  assert.equal(policy.consumer.validation_mode, 'pinned-or-authority-equivalent');
+  assert.equal(policy.consumer.authority_paths.length, 7);
   assert.equal(policy.release.exact_asset_count, 1);
   assert.equal(policy.release.require_final, true);
   assert.equal(policy.release.require_immutable, true);
