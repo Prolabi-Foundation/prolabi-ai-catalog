@@ -12,7 +12,7 @@
       "desktop/src/semanticVersion.ts",
       "desktop/src/signedCatalog.ts"
     ],
-    "commit": "1e5965141443f1b6b01b60cd7d324e05e0e975a2",
+    "commit": "bb017f972e1953387b10cc33684ef9eadd119590",
     "node_version": "24.14.0",
     "repository": "Prolabi-Foundation/prolabi-desktop",
     "validation_mode": "pinned-or-authority-equivalent",

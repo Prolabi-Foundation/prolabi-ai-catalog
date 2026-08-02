@@ -22,6 +22,7 @@ test('policy pins the canonical Desktop consumer and fail-closed release shape',
   assert.equal(policy.release.require_immutable, true);
   assert.equal(policy.publication.allow_catalog_payloads_in_git, false);
   assert.equal(policy.publication.allow_private_keys_in_git_or_ci, false);
+  assert.equal(policy.publication.minimum_independent_approvals, 2);
 });
 
 test('synthetic payload is created exclusively and contains no production IDs', () => {
