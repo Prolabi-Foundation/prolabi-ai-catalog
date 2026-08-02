@@ -8,6 +8,13 @@ The owner-only OpenAI pilot is a separate, temporary deployment mode. It does no
 
 The repository owner may approve a pilot candidate after recording the exact Desktop commit, catalog version, public-key fingerprints, source URLs and timestamps for model/pricing review, payload SHA-256, maximum approved smoke cost, and cleanup result. The candidate must contain only the three OpenAI descriptors accepted by Desktop's `owner-pilot-openai` publication mode and must expire within seven days. At the 2026-08-02 review, the official model pages list [Luna](https://developers.openai.com/api/docs/models/gpt-5.6-luna) (`gpt-5.6-luna`) at USD 1/6, [Terra](https://developers.openai.com/api/docs/models/gpt-5.6-terra) (`gpt-5.6-terra`) at USD 2.50/15, and [Sol](https://developers.openai.com/api/docs/models/gpt-5.6-sol) (`gpt-5.6-sol`) at USD 5/30 per million input/output tokens; re-check those pages immediately before every candidate because the signed payload, not this prose, is the billable authority.
 
+Desktop may temporarily provide an unpackaged, ephemeral trust harness for local
+solo development. Its keys and catalog are generated in memory, use disposable
+Desktop state, never enter this repository or a GitHub Release, and are not valid
+publication or smoke evidence. Packaged Desktop ignores that harness. Remove it
+from Desktop before the first public release; this runbook remains the only path
+to an owner-pilot or production catalog release.
+
 Validate and sign with the explicit mode:
 
 ```powershell
