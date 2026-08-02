@@ -1,4 +1,6 @@
 import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { spawnSync } from 'node:child_process';
 import { isAbsolute, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -10,6 +12,7 @@ const POLICY_KEYS = [
   'consumer',
   'format',
   'format_version',
+  'owner_pilot',
   'publication',
   'release',
   'repository',
@@ -19,10 +22,15 @@ const CONSUMER_AUTHORITY_PATHS = [
   'desktop/scripts/provider-catalog.mjs',
   'desktop/src/canonicalJson.ts',
   'desktop/src/jsonContract.ts',
+  'desktop/src/main.ts',
+  'desktop/src/nativeAiServices.ts',
+  'desktop/src/providerCatalogDeploymentPolicy.json',
+  'desktop/src/providerCatalogDeploymentPolicy.ts',
   'desktop/src/providerCatalogPublication.ts',
   'desktop/src/providerCatalogTrustedKeys.json',
   'desktop/src/providerCatalogTrustedKeys.ts',
   'desktop/src/providerModelCatalog.ts',
+  'desktop/src/providerModelCatalogRepository.ts',
   'desktop/src/semanticVersion.ts',
   'desktop/src/signedCatalog.ts',
 ];
@@ -36,6 +44,7 @@ export function loadPolicy() {
     value.format_version !== 1 ||
     value.repository !== 'Prolabi-Foundation/prolabi-ai-catalog' ||
     !hasExactKeys(value.consumer, [
+      'authority_sha256',
       'authority_paths',
       'commit',
       'node_version',
@@ -44,12 +53,29 @@ export function loadPolicy() {
       'validator',
     ]) ||
     value.consumer.repository !== 'Prolabi-Foundation/prolabi-desktop' ||
+    !/^[0-9a-f]{64}$/u.test(value.consumer.authority_sha256) ||
     !/^[0-9a-f]{40}$/u.test(value.consumer.commit) ||
     !/^\d+\.\d+\.\d+$/u.test(value.consumer.node_version) ||
     value.consumer.validation_mode !== 'pinned-or-authority-equivalent' ||
     value.consumer.validator !== 'desktop/scripts/provider-catalog.mjs' ||
     JSON.stringify(value.consumer.authority_paths) !==
       JSON.stringify(CONSUMER_AUTHORITY_PATHS) ||
+    !hasExactKeys(value.owner_pilot, [
+      'allowed_providers',
+      'kill_switch_publication_mode',
+      'max_catalog_lifetime_days',
+      'minimum_owner_approvals',
+      'publication_mode',
+      'scope',
+    ]) ||
+    JSON.stringify(value.owner_pilot.allowed_providers) !==
+      JSON.stringify(['openai']) ||
+    value.owner_pilot.kill_switch_publication_mode !==
+      'owner-pilot-disabled' ||
+    value.owner_pilot.max_catalog_lifetime_days !== 7 ||
+    value.owner_pilot.minimum_owner_approvals !== 1 ||
+    value.owner_pilot.publication_mode !== 'owner-pilot-openai' ||
+    value.owner_pilot.scope !== 'repository-owner-only' ||
     !hasExactKeys(value.publication, [
       'allow_catalog_payloads_in_git',
       'allow_private_keys_in_git_or_ci',
@@ -103,6 +129,27 @@ export function parseArguments(values, allowedKeys) {
   return parsed;
 }
 
+export function fingerprintConsumerAuthority(desktopRoot, commit) {
+  const records = CONSUMER_AUTHORITY_PATHS.map((path) => ({
+    path,
+    git_blob_sha1: commandOutput(
+      'git',
+      commit
+        ? ['-C', desktopRoot, 'rev-parse', `${commit}:${path}`]
+        : [
+            '-C',
+            desktopRoot,
+            'hash-object',
+            `--path=${path}`,
+            resolve(desktopRoot, ...path.split('/')),
+          ],
+    ),
+  }));
+  return createHash('sha256')
+    .update(JSON.stringify(records))
+    .digest('hex');
+}
+
 export function requiredAbsolutePath(arguments_, name) {
   const value = arguments_[name];
   if (typeof value !== 'string' || !isAbsolute(value)) {
@@ -127,4 +174,13 @@ export function hasExactKeys(value, keys) {
       Object.keys(value).length === keys.length &&
       keys.every((key) => Object.hasOwn(value, key)),
   );
+}
+
+function commandOutput(command, args) {
+  const result = spawnSync(command, args, { encoding: 'utf8' });
+  const value = result.stdout?.trim() ?? '';
+  if (result.status !== 0 || !/^[0-9a-f]{40}$/u.test(value)) {
+    throw new Error('Desktop catalog authority could not be fingerprinted.');
+  }
+  return value;
 }

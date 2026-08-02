@@ -2,13 +2,13 @@
 
 Public operational repository for Prolabi's signed provider-model catalog. It contains publication policy, verification tooling, CI, and runbooks. It intentionally contains **no production catalog, provider credential, or signing key**.
 
-Prolabi Desktop is the authority for the catalog schema and publication rules. This repository pins an exact Desktop authority in [`policy/catalog-policy.json`](policy/catalog-policy.json), while Desktop's private CI checks out this public repository and validates a synthetic payload. This direction avoids granting a public workflow access to the private product repository, and schema logic is not copied here.
+Prolabi Desktop is the authority for the catalog schema and publication rules. This repository pins an ancestor Desktop commit plus a canonical SHA-256 over the exact Git blobs that form that authority in [`policy/catalog-policy.json`](policy/catalog-policy.json), while Desktop's private CI checks out this public repository and validates a synthetic payload. The blob fingerprint permits a coordinated catalog/consumer update without a circular future-commit reference, but rejects any unreviewed authority drift. This direction avoids granting a public workflow access to the private product repository, and schema logic is not copied here.
 
 ## Current state
 
 - The repository is public and the product remains fail-closed.
 - The production keyring in Prolabi Desktop is empty.
-- No provider model ID or price has been approved.
+- The owner-only OpenAI pilot pins three reviewed aliases, IDs, prices, and a seven-day maximum lifetime in the Desktop consumer policy.
 - No signed release exists and no external provider call is enabled by this repository.
 
 ## Local verification
@@ -27,7 +27,13 @@ node scripts/generate-synthetic-payload.mjs --output D:\catalog-work\catalog.pay
 node scripts/validate-with-desktop.mjs --desktop-dir D:\src\prolabi-desktop --payload D:\catalog-work\catalog.payload.json
 ```
 
-The consumer checkout must be the pinned commit or a descendant that has not changed any allowlisted catalog-authority path. Update the pin and review the authority diff whenever one of those paths changes.
+Owner-pilot candidates must opt into the narrower consumer mode:
+
+```powershell
+node scripts/validate-with-desktop.mjs --desktop-dir D:\src\prolabi-desktop --payload D:\catalog-work\catalog.payload.json --publication-mode owner-pilot-openai
+```
+
+The consumer checkout must be the pinned commit or a descendant whose authority fingerprint exactly matches policy. Before a coordinated update, calculate the reviewed working-tree fingerprint with `npm run consumer:fingerprint -- --desktop-dir D:\src\prolabi-desktop`; after Desktop commits, the validator recomputes the same value from committed Git blobs. Update the ancestor pin and fingerprint only after reviewing every authority-path diff.
 
 ## Publication boundary
 
@@ -44,6 +50,12 @@ node scripts/inspect-release-candidate.mjs --asset D:\catalog-work\prolabi-provi
 ```
 
 This structural inspection does not replace signature verification by Desktop. Follow [`docs/RELEASE_RUNBOOK.md`](docs/RELEASE_RUNBOOK.md) for the full ceremony.
+
+## Owner-only pilot boundary
+
+The temporary pilot is limited to the repository owner and OpenAI. It requires one recorded owner approval, a maximum seven-day catalog lifetime, two offline-created trust roots in Desktop (active and recovery), and a catalog signed by the active key. This is a deployment scope, not a production-governance waiver: production publication continues to require two independent approvals and all three provider families.
+
+Publishing a signed catalog with the same three descriptors marked `deprecated` and no profile mappings is the pilot kill switch. Desktop treats that verified shape as suspended and disables broker access.
 
 ## Governance
 

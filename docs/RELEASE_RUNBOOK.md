@@ -2,6 +2,23 @@
 
 Status: infrastructure only. No production key or catalog release is currently authorized.
 
+The owner-only OpenAI pilot is a separate, temporary deployment mode. It does not satisfy or weaken the production gate described below.
+
+## Owner-only OpenAI pilot
+
+The repository owner may approve a pilot candidate after recording the exact Desktop commit, catalog version, public-key fingerprints, source URLs and timestamps for model/pricing review, payload SHA-256, maximum approved smoke cost, and cleanup result. The candidate must contain only the three OpenAI descriptors accepted by Desktop's `owner-pilot-openai` publication mode and must expire within seven days. At the 2026-08-02 review, the official model pages list [Luna](https://developers.openai.com/api/docs/models/gpt-5.6-luna) (`gpt-5.6-luna`) at USD 1/6, [Terra](https://developers.openai.com/api/docs/models/gpt-5.6-terra) (`gpt-5.6-terra`) at USD 2.50/15, and [Sol](https://developers.openai.com/api/docs/models/gpt-5.6-sol) (`gpt-5.6-sol`) at USD 5/30 per million input/output tokens; re-check those pages immediately before every candidate because the signed payload, not this prose, is the billable authority.
+
+Validate and sign with the explicit mode:
+
+```powershell
+node scripts\validate-with-desktop.mjs --desktop-dir D:\src\prolabi-desktop --payload D:\catalog-work\pilot.payload.json --publication-mode owner-pilot-openai
+node D:\trusted-source\prolabi-desktop\desktop\scripts\provider-catalog.mjs sign --payload D:\offline-work\pilot.payload.json --publication-mode owner-pilot-openai --private-key E:\offline-keys\active.pem --key-id provider-active-YYYY-NN --output D:\offline-work\prolabi-provider-model-catalog-YYYY.MM.N.json
+```
+
+The active and recovery private keys must be created on separate offline systems and kept on separately encrypted offline media. Only their reviewed public-key records enter Desktop. Never create either private key on a development workstation or in CI.
+
+The pilot smoke is OpenAI-only, owner-only, single-run, no-retry after `outcome_unknown`, and capped at USD 0.03. Disable access, remove the test credential, and retain only redacted evidence afterward. A signed `owner-pilot-disabled` candidate with the same three descriptors deprecated and no profiles is the emergency kill switch. Production still requires the nine-model review and two independent approvals in the remaining sections.
+
 ## 1. Repository controls
 
 Before any key ceremony or release:
@@ -22,7 +39,7 @@ Perform the active/recovery Ed25519 ceremony described by Prolabi Desktop's `doc
 
 Add only reviewed public-key records to Desktop. The recovery key must be trusted but must not sign ordinary releases. Merge and verify the Desktop change before updating `consumer.commit` here to that exact commit.
 
-Public CI must remain green after the consumer pin changes, and Desktop's private CI must validate the synthetic payload from the reviewed catalog-operations commit. The public workflow never receives credentials for the private product repository. A green synthetic contract test proves schema compatibility; it does not prove a production key or release.
+Public CI must remain green after the consumer authority changes, and Desktop's private CI must validate the synthetic payload from the reviewed catalog-operations commit. For a coordinated change, record `consumer.authority_sha256` from `npm run consumer:fingerprint -- --desktop-dir <absolute Desktop path>` only after reviewing the complete authority diff; Desktop CI later recomputes it from committed Git blobs. This avoids a circular future-commit pin without allowing arbitrary descendants. The public workflow never receives credentials for the private product repository. A green synthetic contract test proves schema compatibility; it does not prove a production key or release.
 
 ## 3. Prepare release data outside Git
 
