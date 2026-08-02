@@ -1,6 +1,6 @@
 {
   "consumer": {
-    "authority_sha256": "ff11473ed48e16a862edc02869f2c6d004b697d4d9a48c3ef98b3315a2167aa3",
+    "authority_sha256": "b073afddbbd0c8f168e89b7d7a295d6e6786589d6e2ff6d76b24a17ad3cc114b",
     "authority_paths": [
       "desktop/scripts/provider-catalog-keyring.mjs",
       "desktop/scripts/provider-catalog.mjs",
