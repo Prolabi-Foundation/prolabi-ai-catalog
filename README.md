@@ -47,6 +47,6 @@ This structural inspection does not replace signature verification by Desktop. F
 
 ## Governance
 
-Changes must remain small, reviewable, and fail-closed. Configure branch protection for `main` to require this repository's validation workflow and at least two independent approvals. See [`CONTRIBUTING.md`](CONTRIBUTING.md) and [`SECURITY.md`](SECURITY.md).
+Changes must remain small, reviewable, and fail-closed. `main` requires pull requests, an up-to-date branch, this repository's validation workflow, resolved conversations, merge commits, and no force-push or deletion. While the organization has a single maintainer, approving reviews remain temporarily at zero because authors cannot approve their own pull requests; production activation still requires the two independent approvals encoded in policy. See [`CONTRIBUTING.md`](CONTRIBUTING.md) and [`SECURITY.md`](SECURITY.md).
 
 The repository is licensed under [`AGPL-3.0-only`](LICENSE).
