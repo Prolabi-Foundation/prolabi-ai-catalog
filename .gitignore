@@ -1,0 +1,6 @@
+node_modules/
+.consumer/
+coverage/
+*.log
+prolabi-provider-model-catalog-*.json
+catalog.payload.json

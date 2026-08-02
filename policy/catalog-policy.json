@@ -1,0 +1,25 @@
+{
+  "consumer": {
+    "commit": "c10cc935c6575ef73ed1ea596cdd3e8e4a35373b",
+    "node_version": "24.14.0",
+    "repository": "Prolabi-Foundation/prolabi-desktop",
+    "validator": "desktop/scripts/provider-catalog.mjs"
+  },
+  "format": "prolabi-provider-catalog-repository-policy",
+  "format_version": 1,
+  "publication": {
+    "allow_catalog_payloads_in_git": false,
+    "allow_private_keys_in_git_or_ci": false,
+    "minimum_independent_approvals": 2
+  },
+  "release": {
+    "api": "https://api.github.com/repos/Prolabi-Foundation/prolabi-ai-catalog/releases/latest",
+    "asset_name_template": "prolabi-provider-model-catalog-<YYYY.MM.N>.json",
+    "exact_asset_count": 1,
+    "max_asset_bytes": 524288,
+    "require_final": true,
+    "require_immutable": true,
+    "tag_template": "provider-model-catalog-v<YYYY.MM.N>"
+  },
+  "repository": "Prolabi-Foundation/prolabi-ai-catalog"
+}

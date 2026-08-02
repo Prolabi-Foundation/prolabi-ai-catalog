@@ -1,0 +1,65 @@
+name: Validate catalog operations
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: catalog-validation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out catalog operations
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install catalog tooling
+        run: npm ci
+
+      - name: Validate repository policy and tooling
+        run: npm test
+
+      - name: Resolve pinned consumer
+        id: policy
+        run: node scripts/ci-policy-output.mjs
+
+      - name: Check out pinned Desktop consumer
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.policy.outputs.consumer_repository }}
+          ref: ${{ steps.policy.outputs.consumer_commit }}
+          path: .consumer/prolabi-desktop
+          persist-credentials: false
+
+      - name: Install Desktop dependencies
+        working-directory: .consumer/prolabi-desktop/desktop
+        run: npm ci
+
+      - name: Build canonical Desktop validator
+        working-directory: .consumer/prolabi-desktop/desktop
+        run: npm run build
+
+      - name: Generate synthetic contract fixture
+        run: node scripts/generate-synthetic-payload.mjs --output "$RUNNER_TEMP/catalog.payload.json"
+
+      - name: Validate with pinned Desktop consumer
+        run: >-
+          node scripts/validate-with-desktop.mjs
+          --desktop-dir "$GITHUB_WORKSPACE/.consumer/prolabi-desktop"
+          --payload "$RUNNER_TEMP/catalog.payload.json"
