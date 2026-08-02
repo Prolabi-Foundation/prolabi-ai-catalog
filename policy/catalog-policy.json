@@ -1,14 +1,20 @@
 {
   "consumer": {
+    "authority_sha256": "ff11473ed48e16a862edc02869f2c6d004b697d4d9a48c3ef98b3315a2167aa3",
     "authority_paths": [
       "desktop/scripts/provider-catalog-keyring.mjs",
       "desktop/scripts/provider-catalog.mjs",
       "desktop/src/canonicalJson.ts",
       "desktop/src/jsonContract.ts",
+      "desktop/src/main.ts",
+      "desktop/src/nativeAiServices.ts",
+      "desktop/src/providerCatalogDeploymentPolicy.json",
+      "desktop/src/providerCatalogDeploymentPolicy.ts",
       "desktop/src/providerCatalogPublication.ts",
       "desktop/src/providerCatalogTrustedKeys.json",
       "desktop/src/providerCatalogTrustedKeys.ts",
       "desktop/src/providerModelCatalog.ts",
+      "desktop/src/providerModelCatalogRepository.ts",
       "desktop/src/semanticVersion.ts",
       "desktop/src/signedCatalog.ts"
     ],
@@ -20,6 +26,16 @@
   },
   "format": "prolabi-provider-catalog-repository-policy",
   "format_version": 1,
+  "owner_pilot": {
+    "allowed_providers": [
+      "openai"
+    ],
+    "kill_switch_publication_mode": "owner-pilot-disabled",
+    "max_catalog_lifetime_days": 7,
+    "minimum_owner_approvals": 1,
+    "publication_mode": "owner-pilot-openai",
+    "scope": "repository-owner-only"
+  },
   "publication": {
     "allow_catalog_payloads_in_git": false,
     "allow_private_keys_in_git_or_ci": false,
