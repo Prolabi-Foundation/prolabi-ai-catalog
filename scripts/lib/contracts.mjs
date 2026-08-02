@@ -15,10 +15,13 @@ const POLICY_KEYS = [
   'repository',
 ];
 const CONSUMER_AUTHORITY_PATHS = [
+  'desktop/scripts/provider-catalog-keyring.mjs',
   'desktop/scripts/provider-catalog.mjs',
   'desktop/src/canonicalJson.ts',
   'desktop/src/jsonContract.ts',
   'desktop/src/providerCatalogPublication.ts',
+  'desktop/src/providerCatalogTrustedKeys.json',
+  'desktop/src/providerCatalogTrustedKeys.ts',
   'desktop/src/providerModelCatalog.ts',
   'desktop/src/semanticVersion.ts',
   'desktop/src/signedCatalog.ts',

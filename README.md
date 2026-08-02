@@ -49,4 +49,4 @@ This structural inspection does not replace signature verification by Desktop. F
 
 Changes must remain small, reviewable, and fail-closed. Configure branch protection for `main` to require this repository's validation workflow and at least two independent approvals. See [`CONTRIBUTING.md`](CONTRIBUTING.md) and [`SECURITY.md`](SECURITY.md).
 
-No license has been declared yet; the Foundation must make that legal choice before accepting external contributions.
+The repository is licensed under [`AGPL-3.0-only`](LICENSE).
