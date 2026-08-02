@@ -1,5 +1,7 @@
 # Contributing
 
+Contributions are accepted under the repository's [`AGPL-3.0-only`](LICENSE) license.
+
 ## Boundaries
 
 This repository owns release governance and publication tooling. Prolabi Desktop owns the schema, signature verification, anti-rollback behavior, provider adapters, and trusted public keyring.
@@ -19,6 +21,8 @@ Do not commit:
 3. Confirm public CI passes and the private Desktop CI validates a synthetic payload from the exact catalog-operations commit.
 4. Obtain two independent approvals for policy, consumer-pin, release, or trust-boundary changes.
 5. Merge only with required checks green and without administrator bypass.
+
+If the required protection or approval rules are not active, stop before merging even when CI is green. Repository settings are an external activation gate; committed policy cannot substitute for GitHub enforcement.
 
 Updating `consumer.commit` is a security-relevant dependency update. Review the Desktop diff between the old and new pins, especially provider catalog schemas, release source, canonical JSON, signature verification, publication policy, and keyring behavior.
 

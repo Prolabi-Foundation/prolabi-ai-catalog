@@ -10,9 +10,11 @@ Before any key ceremony or release:
 2. Protect `main`; require the validation workflow, two independent approvals, resolved conversations, and no force pushes or deletion.
 3. Restrict release creation and tag mutation to designated maintainers with phishing-resistant MFA.
 4. Enable private vulnerability reporting and organization audit logs where the GitHub plan supports them.
-5. Decide and add the Foundation-approved license before accepting external contributions.
+5. Confirm GitHub identifies the repository license as `AGPL-3.0-only`.
 
 Repository settings are administrative controls and cannot be enforced only by committed files. Capture their review outside this public repository without personal or credential data.
+
+Do not perform the key ceremony while any of these settings remains unverified. A maintainer with repository-administration access must record the settings review privately; local tooling and CI intentionally cannot claim that external state.
 
 ## 2. Establish product trust
 
