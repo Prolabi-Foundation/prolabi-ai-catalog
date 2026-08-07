@@ -44,7 +44,7 @@ Do not perform the key ceremony while any of these settings remains unverified. 
 
 Perform the active/recovery Ed25519 ceremony described by Prolabi Desktop's `docs/PROVIDER_CATALOG_OPERATIONS.md` on separate offline systems. Never place private keys in GitHub, Actions secrets, developer environment variables, shared password managers, tickets, or logs.
 
-Add only reviewed public-key records to Desktop. The recovery key must be trusted but must not sign ordinary releases. Merge and verify the Desktop change before updating `consumer.commit` here to that exact commit.
+Add only reviewed public-key records to Desktop. The recovery key must be trusted but must not sign ordinary releases. Commit and review the Desktop authority change, then update `consumer.commit` here to that exact authority commit and record its committed-blob fingerprint. Merge this operational update before advancing Desktop's immutable catalog-operations source pin; only then may the Desktop change merge with its private CI green.
 
 Public CI must remain green after the consumer authority changes, and Desktop's private CI must validate the synthetic payload from the reviewed catalog-operations commit. For a coordinated change, record `consumer.authority_sha256` from `npm run consumer:fingerprint -- --desktop-dir <absolute Desktop path>` only after reviewing the complete authority diff; Desktop CI later recomputes it from committed Git blobs. This avoids a circular future-commit pin without allowing arbitrary descendants. The public workflow never receives credentials for the private product repository. A green synthetic contract test proves schema compatibility; it does not prove a production key or release.
 

@@ -1,6 +1,6 @@
 {
   "consumer": {
-    "authority_sha256": "13a9401a2030014a1397f83ad6561e9d330d594e633a8cf58667405a779ae486",
+    "authority_sha256": "dce4dfb7b669b23975d600f71edf13909e4c71361b13ee11812f373043fdf18a",
     "authority_paths": [
       "desktop/scripts/provider-catalog-keyring.mjs",
       "desktop/scripts/provider-catalog.mjs",
@@ -18,7 +18,7 @@
       "desktop/src/semanticVersion.ts",
       "desktop/src/signedCatalog.ts"
     ],
-    "commit": "3e627f7283b3d0058828d208eeb1a3fe1f30f9e3",
+    "commit": "a40a8f936cc5c7b05d1f337b77bca368d15a3f07",
     "node_version": "24.14.0",
     "repository": "Prolabi-Foundation/prolabi-desktop",
     "validation_mode": "pinned-or-authority-equivalent",

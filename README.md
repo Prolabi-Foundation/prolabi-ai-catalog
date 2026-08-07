@@ -7,7 +7,9 @@ Prolabi Desktop is the authority for the catalog schema and publication rules. T
 ## Current state
 
 - The repository is public and the product remains fail-closed.
-- The production keyring in Prolabi Desktop is empty.
+- Prolabi Desktop contains one reviewed active and one reviewed recovery public
+  trust root for the owner-only pilot; their private keys remain offline and
+  outside both repositories.
 - The owner-only OpenAI pilot pins three reviewed aliases, IDs, prices, and a seven-day maximum lifetime in the Desktop consumer policy.
 - No signed release exists and no external provider call is enabled by this repository.
 
@@ -33,7 +35,7 @@ Owner-pilot candidates must opt into the narrower consumer mode:
 node scripts/validate-with-desktop.mjs --desktop-dir D:\src\prolabi-desktop --payload D:\catalog-work\catalog.payload.json --publication-mode owner-pilot-openai
 ```
 
-The consumer checkout must be the pinned commit or a descendant whose authority fingerprint exactly matches policy. Before a coordinated update, calculate the reviewed working-tree fingerprint with `npm run consumer:fingerprint -- --desktop-dir D:\src\prolabi-desktop`; after Desktop commits, the validator recomputes the same value from committed Git blobs. Update the ancestor pin and fingerprint only after reviewing every authority-path diff.
+The consumer checkout must be the pinned commit or a descendant whose authority fingerprint exactly matches policy. Before a coordinated update, calculate the reviewed working-tree fingerprint with `npm run consumer:fingerprint -- --desktop-dir D:\src\prolabi-desktop`; after Desktop commits, the validator recomputes the same value from committed Git blobs. Update the ancestor pin and fingerprint only after reviewing every authority-path diff. Merge this operational update before advancing Desktop's immutable catalog-operations source pin; the later source-pin commit is allowed only while the reviewed authority fingerprint remains unchanged.
 
 ## Publication boundary
 
