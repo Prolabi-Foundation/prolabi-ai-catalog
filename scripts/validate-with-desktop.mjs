@@ -49,7 +49,7 @@ if (
   publicationMode === policy.owner_pilot.kill_switch_publication_mode
 ) {
   const evidencePath = requiredAbsolutePath(arguments_, 'evidence');
-  validateOwnerPilotEvidence({
+  const result = validateOwnerPilotEvidence({
     catalogCommit,
     desktopCommit,
     evidencePath,
@@ -58,6 +58,11 @@ if (
     policy,
     publicationMode,
   });
+  if (result.governanceReviewOverdue) {
+    process.stderr.write(
+      'Catalog governance review is due; the advisory does not block publication.\n',
+    );
+  }
 } else if (arguments_.evidence !== undefined) {
   throw new Error('Production validation must not use owner-pilot evidence.');
 }

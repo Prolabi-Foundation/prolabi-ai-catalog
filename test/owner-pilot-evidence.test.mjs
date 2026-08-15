@@ -10,8 +10,18 @@ import { validateOwnerPilotEvidence } from '../scripts/lib/owner-pilot-evidence.
 const commit = 'a'.repeat(40);
 const now = new Date('2026-08-14T18:00:00.000Z');
 const policy = Object.freeze({
+  governance: Object.freeze({
+    approval_rule: 'all-eligible-approvers',
+    effective_from: '2026-08-14T00:00:00.000Z',
+    eligible_approvers: Object.freeze([
+      Object.freeze({ github_login: 'asnielrod', role: 'repository-owner' }),
+    ]),
+    mode: 'single-maintainer-unanimous',
+    review_due_at: '2028-08-14T00:00:00.000Z',
+    review_enforcement: 'advisory',
+    transition: 'explicit-policy-change',
+  }),
   owner_pilot: Object.freeze({
-    governance_review_due_at: '2027-08-14T00:00:00.000Z',
     kill_switch_publication_mode: 'owner-pilot-disabled',
     publication_mode: 'owner-pilot-openai',
   }),
@@ -32,7 +42,7 @@ test('owner-pilot evidence binds current independent pricing to exact payload', 
   });
 });
 
-test('owner-pilot activation rejects stale evidence and overdue governance', () => {
+test('owner-pilot activation rejects stale evidence and reports overdue governance', () => {
   withFixture(({ evidence, evidencePath, payloadPath, writeEvidence }) => {
     evidence.pricing_verification.verified_at = '2026-08-13T17:59:59.999Z';
     writeEvidence();
@@ -48,19 +58,59 @@ test('owner-pilot activation rejects stale evidence and overdue governance', () 
       }),
       /stale/u,
     );
-    evidence.pricing_verification.verified_at = '2026-08-14T17:00:00.000Z';
+    evidence.pricing_verification.verified_at = '2028-08-14T00:00:00.000Z';
+    evidence.pricing_verification.sources = evidence.pricing_verification.sources.map(
+      (source) => ({ ...source, accessed_at: '2028-08-14T00:00:00.000Z' }),
+    );
+    writeEvidence();
+    assert.equal(
+      validateOwnerPilotEvidence({
+        catalogCommit: commit,
+        desktopCommit: commit,
+        evidencePath,
+        now: new Date('2028-08-14T00:00:00.000Z'),
+        payloadPath,
+        policy,
+        publicationMode: 'owner-pilot-openai',
+      }).governanceReviewOverdue,
+      true,
+    );
+  });
+});
+
+test('owner-pilot evidence requires the unanimous eligible approver set', () => {
+  withFixture(({ evidence, evidencePath, payloadPath, writeEvidence }) => {
+    evidence.approvals = [];
     writeEvidence();
     assert.throws(
       () => validateOwnerPilotEvidence({
         catalogCommit: commit,
         desktopCommit: commit,
         evidencePath,
-        now: new Date('2027-08-14T00:00:00.000Z'),
+        now,
         payloadPath,
         policy,
         publicationMode: 'owner-pilot-openai',
       }),
-      /overdue/u,
+      /governance policy/u,
+    );
+    evidence.approvals = [{
+      approved_at: '2026-08-14T17:30:00.000Z',
+      approver: 'another-maintainer',
+      approver_role: 'repository-owner',
+    }];
+    writeEvidence();
+    assert.throws(
+      () => validateOwnerPilotEvidence({
+        catalogCommit: commit,
+        desktopCommit: commit,
+        evidencePath,
+        now,
+        payloadPath,
+        policy,
+        publicationMode: 'owner-pilot-openai',
+      }),
+      /not eligible/u,
     );
   });
 });
@@ -142,12 +192,13 @@ function withFixture(callback) {
       catalog_version: payload.catalog_version,
       desktop_commit: commit,
       format: 'prolabi-owner-pilot-release-evidence',
-      format_version: 1,
+      format_version: 2,
       max_smoke_cost_micros: 30_000,
-      owner_approval: {
+      approvals: [{
         approved_at: '2026-08-14T17:30:00.000Z',
-        approver: 'repository-owner',
-      },
+        approver: 'asnielrod',
+        approver_role: 'repository-owner',
+      }],
       payload_sha256: createHash('sha256')
         .update(readFileSync(payloadPath))
         .digest('hex'),

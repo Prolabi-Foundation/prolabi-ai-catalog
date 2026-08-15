@@ -11,7 +11,8 @@ Prolabi Desktop is the authority for the catalog schema and publication rules. T
   trust root for the owner-only pilot; their private keys remain offline and
   outside both repositories.
 - The owner-only OpenAI pilot pins three reviewed aliases, IDs, prices, and an exact 180-day maximum lifetime in the Desktop consumer policy.
-- No signed release exists and no external provider call is enabled by this repository.
+- The final immutable owner-only release `provider-model-catalog-v2026.08.2`
+  exists; external provider access remains a separate, explicit Desktop control.
 
 ## Local verification
 
@@ -55,14 +56,14 @@ This structural inspection does not replace signature verification by Desktop. F
 
 ## Owner-only pilot boundary
 
-The temporary pilot is limited to the repository owner and OpenAI. It requires one recorded owner approval, one independently recorded price verification against current official provider documentation, a maximum exact 180-day catalog lifetime, two offline-created trust roots in Desktop (active and recovery), and a catalog signed by the active key. A locally operated review agent may produce the independent verification record for this single-maintainer pilot. This is a deployment scope, not a production-governance waiver: production publication continues to require two independent human approvals and all three provider families.
+The pilot deployment mode is limited to the repository owner and OpenAI. It requires the same unanimous catalog approval used for production, one independently recorded price verification against current official provider documentation, a maximum exact 180-day catalog lifetime, two offline-created trust roots in Desktop (active and recovery), and one catalog signature from the active key. A locally operated review agent may produce the technical verification record. Production still requires its separate nine-model catalog and all three provider families; only the human-approval policy is shared.
 
-The bootstrap policy is reviewed annually. Tooling blocks new owner-pilot activations when `governance_review_due_at` is reached, but continues to permit the fail-closed kill switch. Evidence remains outside Git and outside the one-asset Release.
+The single-maintainer policy is reviewed on 2028-08-14. That review is advisory and never changes or blocks the 1/1 approval rule; only an explicit versioned policy change can do so. Evidence remains outside Git and outside the one-asset Release.
 
 Publishing a signed catalog with the same three descriptors marked `deprecated` and no profile mappings is the pilot kill switch. Desktop treats that verified shape as suspended and disables broker access.
 
 ## Governance
 
-Changes must remain small, reviewable, and fail-closed. `main` requires pull requests, an up-to-date branch, this repository's validation workflow, resolved conversations, merge commits, and no force-push or deletion. While the organization has a single maintainer, approving reviews remain temporarily at zero because authors cannot approve their own pull requests; production activation still requires the two independent approvals encoded in policy. See [`CONTRIBUTING.md`](CONTRIBUTING.md) and [`SECURITY.md`](SECURITY.md).
+Changes must remain small, reviewable, and fail-closed. `main` requires pull requests, an up-to-date branch, this repository's validation workflow, resolved conversations, merge commits, and no force-push or deletion. GitHub approving reviews remain at zero while the sole maintainer authors the changes because authors cannot approve their own pull requests. Every catalog publication, including production, instead records the unanimous approval of all policy-eligible maintainers. The current eligible set is only `asnielrod`, so unanimity is 1/1. See [`CONTRIBUTING.md`](CONTRIBUTING.md) and [`SECURITY.md`](SECURITY.md).
 
 The repository is licensed under [`AGPL-3.0-only`](LICENSE).

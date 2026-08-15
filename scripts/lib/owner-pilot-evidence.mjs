@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 
 import { hasExactKeys, isCanonicalTimestamp, readJson } from './contracts.mjs';
+import { validateCatalogApprovals } from './catalog-governance.mjs';
 
 const EVIDENCE_FORMAT = 'prolabi-owner-pilot-release-evidence';
 const MAX_PRICE_REVIEW_AGE_MS = 24 * 60 * 60 * 1_000;
@@ -25,20 +26,20 @@ export function validateOwnerPilotEvidence(options) {
   if (
     !hasExactKeys(evidence, [
       'active_key',
+      'approvals',
       'catalog_operations_commit',
       'catalog_version',
       'desktop_commit',
       'format',
       'format_version',
       'max_smoke_cost_micros',
-      'owner_approval',
       'payload_sha256',
       'pricing_verification',
       'publication_mode',
       'purpose',
     ]) ||
     evidence.format !== EVIDENCE_FORMAT ||
-    evidence.format_version !== 1 ||
+    evidence.format_version !== 2 ||
     evidence.publication_mode !== options.publicationMode ||
     evidence.purpose !== (isActivation ? 'activation' : 'kill-switch') ||
     evidence.catalog_version !== payload.catalog_version ||
@@ -50,18 +51,16 @@ export function validateOwnerPilotEvidence(options) {
       createHash('sha256').update(payloadBytes).digest('hex') ||
     !SHA256_PATTERN.test(evidence.payload_sha256) ||
     !validActiveKey(evidence.active_key) ||
-    !validOwnerApproval(evidence.owner_approval, nowMs) ||
     evidence.max_smoke_cost_micros !== (isActivation ? 30_000 : 0)
   ) {
     throw new Error('Owner-pilot release evidence is invalid.');
   }
+  const governance = validateCatalogApprovals(
+    evidence.approvals,
+    options.policy.governance,
+    options.now,
+  );
   if (isActivation) {
-    const reviewDueMs = Date.parse(
-      options.policy.owner_pilot.governance_review_due_at,
-    );
-    if (nowMs >= reviewDueMs) {
-      throw new Error('Single-maintainer governance review is overdue.');
-    }
     validatePricingVerification(evidence.pricing_verification, payload, nowMs);
   } else if (evidence.pricing_verification !== null) {
     throw new Error('Kill-switch evidence must not depend on pricing review.');
@@ -70,6 +69,7 @@ export function validateOwnerPilotEvidence(options) {
     catalogVersion: evidence.catalog_version,
     payloadSha256: evidence.payload_sha256,
     purpose: evidence.purpose,
+    governanceReviewOverdue: governance.reviewOverdue,
   });
 }
 
@@ -79,20 +79,6 @@ function validActiveKey(value) {
       SHA256_PATTERN.test(value.fingerprint_sha256) &&
       /^[a-z0-9][a-z0-9._-]{1,95}$/u.test(value.key_id),
   );
-}
-
-function validOwnerApproval(value, nowMs) {
-  if (
-    !hasExactKeys(value, ['approved_at', 'approver']) ||
-    !isCanonicalTimestamp(value.approved_at) ||
-    typeof value.approver !== 'string' ||
-    !/^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$/u.test(
-      value.approver,
-    )
-  ) {
-    return false;
-  }
-  return Date.parse(value.approved_at) <= nowMs + MAX_CLOCK_SKEW_MS;
 }
 
 function validatePricingVerification(value, payload, nowMs) {
