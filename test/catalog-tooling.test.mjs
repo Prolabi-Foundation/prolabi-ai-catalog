@@ -34,7 +34,17 @@ test('policy pins the canonical Desktop consumer and fail-closed release shape',
     'owner-pilot-disabled',
   );
   assert.equal(policy.owner_pilot.max_catalog_lifetime_days, 180);
+  assert.equal(policy.owner_pilot.governance_mode, 'single-maintainer-bootstrap');
+  assert.equal(
+    policy.owner_pilot.governance_review_due_at,
+    '2027-08-14T00:00:00.000Z',
+  );
+  assert.equal(policy.owner_pilot.minimum_independent_price_verifications, 1);
   assert.equal(policy.owner_pilot.minimum_owner_approvals, 1);
+  assert.equal(
+    policy.owner_pilot.price_verification_authority,
+    'official-provider-documentation',
+  );
   assert.equal(policy.owner_pilot.publication_mode, 'owner-pilot-openai');
 });
 

@@ -64,18 +64,27 @@ export function loadPolicy() {
       JSON.stringify(CONSUMER_AUTHORITY_PATHS) ||
     !hasExactKeys(value.owner_pilot, [
       'allowed_providers',
+      'governance_mode',
+      'governance_review_due_at',
       'kill_switch_publication_mode',
       'max_catalog_lifetime_days',
+      'minimum_independent_price_verifications',
       'minimum_owner_approvals',
+      'price_verification_authority',
       'publication_mode',
       'scope',
     ]) ||
     JSON.stringify(value.owner_pilot.allowed_providers) !==
       JSON.stringify(['openai']) ||
+    value.owner_pilot.governance_mode !== 'single-maintainer-bootstrap' ||
+    !isCanonicalTimestamp(value.owner_pilot.governance_review_due_at) ||
     value.owner_pilot.kill_switch_publication_mode !==
       'owner-pilot-disabled' ||
     value.owner_pilot.max_catalog_lifetime_days !== 180 ||
+    value.owner_pilot.minimum_independent_price_verifications !== 1 ||
     value.owner_pilot.minimum_owner_approvals !== 1 ||
+    value.owner_pilot.price_verification_authority !==
+      'official-provider-documentation' ||
     value.owner_pilot.publication_mode !== 'owner-pilot-openai' ||
     value.owner_pilot.scope !== 'repository-owner-only' ||
     !hasExactKeys(value.publication, [
@@ -176,6 +185,14 @@ export function hasExactKeys(value, keys) {
       Object.keys(value).length === keys.length &&
       keys.every((key) => Object.hasOwn(value, key)),
   );
+}
+
+export function isCanonicalTimestamp(value) {
+  if (typeof value !== 'string') {
+    return false;
+  }
+  const parsed = new Date(value);
+  return !Number.isNaN(parsed.valueOf()) && parsed.toISOString() === value;
 }
 
 function commandOutput(command, args) {
