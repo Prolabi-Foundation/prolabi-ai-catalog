@@ -28,6 +28,7 @@ const PRIVATE_KEY_MARKER = new RegExp(
 loadPolicy();
 
 const violations = [];
+inspectRepositoryMetadata();
 for (const path of walk(REPOSITORY_ROOT)) {
   const repositoryPath = relative(REPOSITORY_ROOT, path).replaceAll('\\', '/');
   const filename = repositoryPath.split('/').at(-1) ?? '';
@@ -59,6 +60,22 @@ if (violations.length > 0) {
   throw new Error(`Repository policy failed:\n${violations.join('\n')}`);
 }
 process.stdout.write('Repository policy is valid; no catalog payloads or private keys are committed.\n');
+
+function inspectRepositoryMetadata() {
+  const packageMetadata = JSON.parse(
+    readFileSync(resolve(REPOSITORY_ROOT, 'package.json'), 'utf8'),
+  );
+  if (packageMetadata.license !== 'AGPL-3.0-only') {
+    violations.push('package.json: license must be AGPL-3.0-only');
+  }
+  const license = readFileSync(resolve(REPOSITORY_ROOT, 'LICENSE'), 'utf8');
+  if (
+    !license.includes('GNU AFFERO GENERAL PUBLIC LICENSE') ||
+    !license.includes('Version 3, 19 November 2007')
+  ) {
+    violations.push('LICENSE: canonical AGPL version 3 text is required');
+  }
+}
 
 function* walk(directory) {
   for (const entry of readdirSync(directory, { withFileTypes: true })) {

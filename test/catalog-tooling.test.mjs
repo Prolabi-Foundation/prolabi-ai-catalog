@@ -1,22 +1,54 @@
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import test from 'node:test';
 
-import { loadPolicy, REPOSITORY_ROOT } from '../scripts/lib/contracts.mjs';
+import {
+  fingerprintConsumerAuthority,
+  loadPolicy,
+  REPOSITORY_ROOT,
+} from '../scripts/lib/contracts.mjs';
 
 test('policy pins the canonical Desktop consumer and fail-closed release shape', () => {
   const policy = loadPolicy();
   assert.equal(policy.consumer.commit.length, 40);
   assert.equal(policy.consumer.validation_mode, 'pinned-or-authority-equivalent');
-  assert.equal(policy.consumer.authority_paths.length, 7);
+  assert.equal(policy.consumer.authority_paths.length, 17);
+  assert.match(policy.consumer.authority_sha256, /^[0-9a-f]{64}$/u);
+  assert.ok(
+    policy.consumer.authority_paths.includes(
+      'desktop/src/providerCatalogTrustedKeys.json',
+    ),
+  );
   assert.equal(policy.release.exact_asset_count, 1);
   assert.equal(policy.release.require_final, true);
   assert.equal(policy.release.require_immutable, true);
   assert.equal(policy.publication.allow_catalog_payloads_in_git, false);
   assert.equal(policy.publication.allow_private_keys_in_git_or_ci, false);
+  assert.equal(policy.format_version, 2);
+  assert.equal(policy.governance.mode, 'single-maintainer-unanimous');
+  assert.equal(policy.governance.approval_rule, 'all-eligible-approvers');
+  assert.deepEqual(policy.governance.eligible_approvers, [
+    { github_login: 'asnielrod', role: 'repository-owner' },
+  ]);
+  assert.equal(policy.governance.effective_from, '2026-08-14T00:00:00.000Z');
+  assert.equal(policy.governance.review_due_at, '2028-08-14T00:00:00.000Z');
+  assert.equal(policy.governance.review_enforcement, 'advisory');
+  assert.equal(policy.governance.transition, 'explicit-policy-change');
+  assert.deepEqual(policy.owner_pilot.allowed_providers, ['openai']);
+  assert.equal(
+    policy.owner_pilot.kill_switch_publication_mode,
+    'owner-pilot-disabled',
+  );
+  assert.equal(policy.owner_pilot.max_catalog_lifetime_days, 180);
+  assert.equal(policy.owner_pilot.minimum_independent_price_verifications, 1);
+  assert.equal(
+    policy.owner_pilot.price_verification_authority,
+    'official-provider-documentation',
+  );
+  assert.equal(policy.owner_pilot.publication_mode, 'owner-pilot-openai');
 });
 
 test('synthetic payload is created exclusively and contains no production IDs', () => {
@@ -33,6 +65,33 @@ test('synthetic payload is created exclusively and contains no production IDs', 
       output,
     ]);
     assert.notEqual(second.status, 0);
+  });
+});
+
+test('consumer authority fingerprint binds exact Git blobs before and after commit', () => {
+  withTemporaryDirectory((directory) => {
+    const policy = loadPolicy();
+    runCommand('git', ['init', '--initial-branch=main'], directory);
+    runCommand('git', ['config', 'user.email', 'catalog-test@prolabi.invalid'], directory);
+    runCommand('git', ['config', 'user.name', 'Catalog Test'], directory);
+    for (const path of policy.consumer.authority_paths) {
+      const file = resolve(directory, ...path.split('/'));
+      mkdirSync(resolve(file, '..'), { recursive: true });
+      writeFileSync(file, `${path}\n`);
+    }
+    const workingFingerprint = fingerprintConsumerAuthority(directory);
+    runCommand('git', ['add', '.'], directory);
+    runCommand('git', ['commit', '-m', 'fixture'], directory);
+    const commit = runCommand('git', ['rev-parse', 'HEAD'], directory).trim();
+    assert.equal(
+      fingerprintConsumerAuthority(directory, commit),
+      workingFingerprint,
+    );
+    writeFileSync(
+      resolve(directory, ...policy.consumer.authority_paths[0].split('/')),
+      'drift\n',
+    );
+    assert.notEqual(fingerprintConsumerAuthority(directory), workingFingerprint);
   });
 });
 
@@ -121,6 +180,10 @@ function spawn(script, arguments_) {
     [resolve(REPOSITORY_ROOT, script), ...arguments_],
     { cwd: REPOSITORY_ROOT, encoding: 'utf8' },
   );
+}
+
+function runCommand(command, arguments_, cwd) {
+  return execFileSync(command, arguments_, { cwd, encoding: 'utf8' });
 }
 
 function withTemporaryDirectory(callback) {
