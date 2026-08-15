@@ -12,6 +12,7 @@ const POLICY_KEYS = [
   'consumer',
   'format',
   'format_version',
+  'governance',
   'owner_pilot',
   'publication',
   'release',
@@ -43,7 +44,7 @@ export function loadPolicy() {
   if (
     !hasExactKeys(value, POLICY_KEYS) ||
     value.format !== 'prolabi-provider-catalog-repository-policy' ||
-    value.format_version !== 1 ||
+    value.format_version !== 2 ||
     value.repository !== 'Prolabi-Foundation/prolabi-ai-catalog' ||
     !hasExactKeys(value.consumer, [
       'authority_sha256',
@@ -62,27 +63,43 @@ export function loadPolicy() {
     value.consumer.validator !== 'desktop/scripts/provider-catalog.mjs' ||
     JSON.stringify(value.consumer.authority_paths) !==
       JSON.stringify(CONSUMER_AUTHORITY_PATHS) ||
+    !hasExactKeys(value.governance, [
+      'approval_rule',
+      'effective_from',
+      'eligible_approvers',
+      'mode',
+      'review_due_at',
+      'review_enforcement',
+      'transition',
+    ]) ||
+    value.governance.approval_rule !== 'all-eligible-approvers' ||
+    !isCanonicalTimestamp(value.governance.effective_from) ||
+    JSON.stringify(value.governance.eligible_approvers) !==
+      JSON.stringify([
+        { github_login: 'asnielrod', role: 'repository-owner' },
+      ]) ||
+    value.governance.mode !== 'single-maintainer-unanimous' ||
+    !isCanonicalTimestamp(value.governance.review_due_at) ||
+    Date.parse(value.governance.review_due_at) -
+      Date.parse(value.governance.effective_from) !==
+      731 * 24 * 60 * 60 * 1_000 ||
+    value.governance.review_enforcement !== 'advisory' ||
+    value.governance.transition !== 'explicit-policy-change' ||
     !hasExactKeys(value.owner_pilot, [
       'allowed_providers',
-      'governance_mode',
-      'governance_review_due_at',
       'kill_switch_publication_mode',
       'max_catalog_lifetime_days',
       'minimum_independent_price_verifications',
-      'minimum_owner_approvals',
       'price_verification_authority',
       'publication_mode',
       'scope',
     ]) ||
     JSON.stringify(value.owner_pilot.allowed_providers) !==
       JSON.stringify(['openai']) ||
-    value.owner_pilot.governance_mode !== 'single-maintainer-bootstrap' ||
-    !isCanonicalTimestamp(value.owner_pilot.governance_review_due_at) ||
     value.owner_pilot.kill_switch_publication_mode !==
       'owner-pilot-disabled' ||
     value.owner_pilot.max_catalog_lifetime_days !== 180 ||
     value.owner_pilot.minimum_independent_price_verifications !== 1 ||
-    value.owner_pilot.minimum_owner_approvals !== 1 ||
     value.owner_pilot.price_verification_authority !==
       'official-provider-documentation' ||
     value.owner_pilot.publication_mode !== 'owner-pilot-openai' ||
@@ -90,11 +107,9 @@ export function loadPolicy() {
     !hasExactKeys(value.publication, [
       'allow_catalog_payloads_in_git',
       'allow_private_keys_in_git_or_ci',
-      'minimum_independent_approvals',
     ]) ||
     value.publication.allow_catalog_payloads_in_git !== false ||
     value.publication.allow_private_keys_in_git_or_ci !== false ||
-    value.publication.minimum_independent_approvals !== 2 ||
     !hasExactKeys(value.release, [
       'api',
       'asset_name_template',

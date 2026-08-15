@@ -27,20 +27,23 @@ test('policy pins the canonical Desktop consumer and fail-closed release shape',
   assert.equal(policy.release.require_immutable, true);
   assert.equal(policy.publication.allow_catalog_payloads_in_git, false);
   assert.equal(policy.publication.allow_private_keys_in_git_or_ci, false);
-  assert.equal(policy.publication.minimum_independent_approvals, 2);
+  assert.equal(policy.format_version, 2);
+  assert.equal(policy.governance.mode, 'single-maintainer-unanimous');
+  assert.equal(policy.governance.approval_rule, 'all-eligible-approvers');
+  assert.deepEqual(policy.governance.eligible_approvers, [
+    { github_login: 'asnielrod', role: 'repository-owner' },
+  ]);
+  assert.equal(policy.governance.effective_from, '2026-08-14T00:00:00.000Z');
+  assert.equal(policy.governance.review_due_at, '2028-08-14T00:00:00.000Z');
+  assert.equal(policy.governance.review_enforcement, 'advisory');
+  assert.equal(policy.governance.transition, 'explicit-policy-change');
   assert.deepEqual(policy.owner_pilot.allowed_providers, ['openai']);
   assert.equal(
     policy.owner_pilot.kill_switch_publication_mode,
     'owner-pilot-disabled',
   );
   assert.equal(policy.owner_pilot.max_catalog_lifetime_days, 180);
-  assert.equal(policy.owner_pilot.governance_mode, 'single-maintainer-bootstrap');
-  assert.equal(
-    policy.owner_pilot.governance_review_due_at,
-    '2027-08-14T00:00:00.000Z',
-  );
   assert.equal(policy.owner_pilot.minimum_independent_price_verifications, 1);
-  assert.equal(policy.owner_pilot.minimum_owner_approvals, 1);
   assert.equal(
     policy.owner_pilot.price_verification_authority,
     'official-provider-documentation',
