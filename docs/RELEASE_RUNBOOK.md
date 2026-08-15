@@ -1,6 +1,8 @@
 # Provider catalog release runbook
 
-Status: infrastructure only. No production key or catalog release is currently authorized.
+Status: the final immutable owner-only release `provider-model-catalog-v2026.08.2`
+is published and its paid smoke remains pending. No production catalog or release
+is currently authorized.
 
 The owner-only OpenAI pilot remains a narrower technical deployment mode. Pilot and production share the global unanimous governance policy; the current eligible set is only `asnielrod`, so every catalog requires one human approval.
 
@@ -8,12 +10,11 @@ The owner-only OpenAI pilot remains a narrower technical deployment mode. Pilot 
 
 The repository owner may approve a pilot candidate after recording the exact Desktop commit, catalog version, public-key fingerprints, source URLs and timestamps for model/pricing review, payload SHA-256, maximum approved smoke cost, and cleanup result. One independent verification record against current official provider documentation is also required; a locally operated review agent may produce it, but it is technical evidence rather than another approval. New evidence uses `prolabi-owner-pilot-release-evidence` version 2, remains outside Git and the Release, matches the exact payload bytes and is less than 24 hours old. The advisory governance review on 2028-08-14 does not block activation or change 1/1 approval. The candidate must contain only the three OpenAI descriptors accepted by Desktop's `owner-pilot-openai` publication mode and must expire within exactly 180 days or less. At the 2026-08-14 verification, the official model pages list [Luna](https://developers.openai.com/api/docs/models/gpt-5.6-luna) (`gpt-5.6-luna`) at USD 0.20/1.20, [Terra](https://developers.openai.com/api/docs/models/gpt-5.6-terra) (`gpt-5.6-terra`) at USD 2/12, and [Sol](https://developers.openai.com/api/docs/models/gpt-5.6-sol) (`gpt-5.6-sol`) at USD 5/30 per million standard input/output tokens; re-check those pages immediately before every candidate because the signed payload, not this prose, is the billable authority.
 
-Desktop may temporarily provide an unpackaged, ephemeral trust harness for local
-solo development. Its keys and catalog are generated in memory, use disposable
-Desktop state, never enter this repository or a GitHub Release, and are not valid
-publication or smoke evidence. Packaged Desktop ignores that harness. Remove it
-from Desktop before the first public release; this runbook remains the only path
-to an owner-pilot or production catalog release.
+Desktop accepts provider catalogs only through the final immutable GitHub Release
+source and the compiled public keyring. Loopback transports and synthetic catalog
+fixtures remain valid for automated tests, but they cannot authorize a paid smoke
+or serve as publication evidence. This runbook is the only path to an owner-pilot
+or production catalog release.
 
 Validate and sign with the explicit mode:
 
