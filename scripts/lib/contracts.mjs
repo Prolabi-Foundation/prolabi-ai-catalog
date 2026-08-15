@@ -20,6 +20,8 @@ const POLICY_KEYS = [
 const CONSUMER_AUTHORITY_PATHS = [
   'desktop/scripts/provider-catalog-keyring.mjs',
   'desktop/scripts/provider-catalog.mjs',
+  'desktop/scripts/generate-owner-pilot-provider-catalog.mjs',
+  'desktop/scripts/support/private-key-loader.mjs',
   'desktop/src/canonicalJson.ts',
   'desktop/src/jsonContract.ts',
   'desktop/src/main.ts',
@@ -72,7 +74,7 @@ export function loadPolicy() {
       JSON.stringify(['openai']) ||
     value.owner_pilot.kill_switch_publication_mode !==
       'owner-pilot-disabled' ||
-    value.owner_pilot.max_catalog_lifetime_days !== 7 ||
+    value.owner_pilot.max_catalog_lifetime_days !== 180 ||
     value.owner_pilot.minimum_owner_approvals !== 1 ||
     value.owner_pilot.publication_mode !== 'owner-pilot-openai' ||
     value.owner_pilot.scope !== 'repository-owner-only' ||

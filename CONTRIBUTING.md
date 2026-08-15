@@ -24,7 +24,7 @@ Do not commit:
 
 The organization currently has one maintainer. GitHub does not allow the author to approve their own pull request, so the protected source branch temporarily requires zero approving reviews while still requiring a pull request, an up-to-date branch, the `validate` check, resolved conversations, and merge commits. This documented source-governance exception does not satisfy `publication.minimum_independent_approvals`, does not authorize a key ceremony or provider release, and must be replaced with two required independent approvals as soon as a second maintainer is available.
 
-The separately encoded `owner_pilot` policy permits the repository owner to approve an OpenAI-only, seven-day pilot candidate. It does not authorize a production candidate, additional providers, a longer lifetime, or a reduction of `publication.minimum_independent_approvals`.
+The separately encoded `owner_pilot` policy permits the repository owner to approve an OpenAI-only pilot candidate with an exact maximum lifetime of 180 days. It does not authorize a production candidate, additional providers, a longer lifetime, or a reduction of `publication.minimum_independent_approvals`.
 
 If the required protection is not active, or a production activation lacks the two independent approvals required by policy, stop before merging or publishing even when CI is green. Repository settings are an external activation gate; committed policy cannot substitute for GitHub enforcement.
 

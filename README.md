@@ -10,7 +10,7 @@ Prolabi Desktop is the authority for the catalog schema and publication rules. T
 - Prolabi Desktop contains one reviewed active and one reviewed recovery public
   trust root for the owner-only pilot; their private keys remain offline and
   outside both repositories.
-- The owner-only OpenAI pilot pins three reviewed aliases, IDs, prices, and a seven-day maximum lifetime in the Desktop consumer policy.
+- The owner-only OpenAI pilot pins three reviewed aliases, IDs, prices, and an exact 180-day maximum lifetime in the Desktop consumer policy.
 - No signed release exists and no external provider call is enabled by this repository.
 
 ## Local verification
@@ -55,7 +55,7 @@ This structural inspection does not replace signature verification by Desktop. F
 
 ## Owner-only pilot boundary
 
-The temporary pilot is limited to the repository owner and OpenAI. It requires one recorded owner approval, a maximum seven-day catalog lifetime, two offline-created trust roots in Desktop (active and recovery), and a catalog signed by the active key. This is a deployment scope, not a production-governance waiver: production publication continues to require two independent approvals and all three provider families.
+The temporary pilot is limited to the repository owner and OpenAI. It requires one recorded owner approval, a maximum exact 180-day catalog lifetime, two offline-created trust roots in Desktop (active and recovery), and a catalog signed by the active key. This is a deployment scope, not a production-governance waiver: production publication continues to require two independent approvals and all three provider families.
 
 Publishing a signed catalog with the same three descriptors marked `deprecated` and no profile mappings is the pilot kill switch. Desktop treats that verified shape as suspended and disables broker access.
 
