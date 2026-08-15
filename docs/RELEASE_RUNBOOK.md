@@ -25,7 +25,7 @@ node D:\trusted-source\prolabi-desktop\desktop\scripts\provider-catalog.mjs sign
 
 The active and recovery private keys must be created on separate offline systems and kept on separately encrypted offline media. Only their reviewed public-key records enter Desktop. Never create either private key on a development workstation or in CI.
 
-The pilot smoke is OpenAI-only, owner-only, single-run, no-retry after `outcome_unknown`, and capped at USD 0.03. Disable access, remove the test credential, and retain only redacted evidence afterward. A signed `owner-pilot-disabled` candidate with the same three descriptors deprecated and no profiles is the emergency kill switch. Production still requires its nine-model review, three provider smokes and remaining technical gates, but uses the same 1/1 human approval.
+The pilot smoke is one OpenAI-only, owner-only ceremony containing exactly one successful response and one cancellation. Its total authorization is capped at USD 0.03; there is no automatic retry and no retry after `outcome_unknown`. Revoke any bounded conversation authorization, disable access, remove the test credential, and retain only redacted evidence afterward. A signed `owner-pilot-disabled` candidate with the same three descriptors deprecated and no profiles is the emergency kill switch. Production still requires its nine-model review, three provider smokes and remaining technical gates, but uses the same 1/1 human approval.
 
 ## 1. Repository controls
 
