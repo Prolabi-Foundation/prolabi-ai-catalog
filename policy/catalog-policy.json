@@ -1,26 +1,61 @@
 {
   "consumer": {
+    "authority_sha256": "9f39ac85dacb3e9740e2154a0db9502328314520601e344c01b8785df8bcd4a8",
     "authority_paths": [
+      "desktop/scripts/provider-catalog-keyring.mjs",
       "desktop/scripts/provider-catalog.mjs",
+      "desktop/scripts/generate-owner-pilot-provider-catalog.mjs",
+      "desktop/scripts/support/private-key-loader.mjs",
       "desktop/src/canonicalJson.ts",
       "desktop/src/jsonContract.ts",
+      "desktop/src/main.ts",
+      "desktop/src/nativeAiServices.ts",
+      "desktop/src/providerCatalogDeploymentPolicy.json",
+      "desktop/src/providerCatalogDeploymentPolicy.ts",
       "desktop/src/providerCatalogPublication.ts",
+      "desktop/src/providerCatalogTrustedKeys.json",
+      "desktop/src/providerCatalogTrustedKeys.ts",
       "desktop/src/providerModelCatalog.ts",
+      "desktop/src/providerModelCatalogRepository.ts",
       "desktop/src/semanticVersion.ts",
       "desktop/src/signedCatalog.ts"
     ],
-    "commit": "c10cc935c6575ef73ed1ea596cdd3e8e4a35373b",
+    "commit": "9bcebf4cea155bcaa78aa085a59a046ddedd31ed",
     "node_version": "24.14.0",
     "repository": "Prolabi-Foundation/prolabi-desktop",
     "validation_mode": "pinned-or-authority-equivalent",
     "validator": "desktop/scripts/provider-catalog.mjs"
   },
   "format": "prolabi-provider-catalog-repository-policy",
-  "format_version": 1,
+  "format_version": 2,
+  "governance": {
+    "approval_rule": "all-eligible-approvers",
+    "effective_from": "2026-08-14T00:00:00.000Z",
+    "eligible_approvers": [
+      {
+        "github_login": "asnielrod",
+        "role": "repository-owner"
+      }
+    ],
+    "mode": "single-maintainer-unanimous",
+    "review_due_at": "2028-08-14T00:00:00.000Z",
+    "review_enforcement": "advisory",
+    "transition": "explicit-policy-change"
+  },
+  "owner_pilot": {
+    "allowed_providers": [
+      "openai"
+    ],
+    "kill_switch_publication_mode": "owner-pilot-disabled",
+    "max_catalog_lifetime_days": 180,
+    "minimum_independent_price_verifications": 1,
+    "price_verification_authority": "official-provider-documentation",
+    "publication_mode": "owner-pilot-openai",
+    "scope": "repository-owner-only"
+  },
   "publication": {
     "allow_catalog_payloads_in_git": false,
-    "allow_private_keys_in_git_or_ci": false,
-    "minimum_independent_approvals": 2
+    "allow_private_keys_in_git_or_ci": false
   },
   "release": {
     "api": "https://api.github.com/repos/Prolabi-Foundation/prolabi-ai-catalog/releases/latest",
