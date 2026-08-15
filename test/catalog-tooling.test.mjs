@@ -15,7 +15,7 @@ test('policy pins the canonical Desktop consumer and fail-closed release shape',
   const policy = loadPolicy();
   assert.equal(policy.consumer.commit.length, 40);
   assert.equal(policy.consumer.validation_mode, 'pinned-or-authority-equivalent');
-  assert.equal(policy.consumer.authority_paths.length, 15);
+  assert.equal(policy.consumer.authority_paths.length, 17);
   assert.match(policy.consumer.authority_sha256, /^[0-9a-f]{64}$/u);
   assert.ok(
     policy.consumer.authority_paths.includes(
@@ -33,7 +33,7 @@ test('policy pins the canonical Desktop consumer and fail-closed release shape',
     policy.owner_pilot.kill_switch_publication_mode,
     'owner-pilot-disabled',
   );
-  assert.equal(policy.owner_pilot.max_catalog_lifetime_days, 7);
+  assert.equal(policy.owner_pilot.max_catalog_lifetime_days, 180);
   assert.equal(policy.owner_pilot.minimum_owner_approvals, 1);
   assert.equal(policy.owner_pilot.publication_mode, 'owner-pilot-openai');
 });

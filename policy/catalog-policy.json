@@ -1,9 +1,11 @@
 {
   "consumer": {
-    "authority_sha256": "dce4dfb7b669b23975d600f71edf13909e4c71361b13ee11812f373043fdf18a",
+    "authority_sha256": "c80b36ddb55843e291a269711d5493ba9fa3a0ebf93ecf8ad8f358de53df5361",
     "authority_paths": [
       "desktop/scripts/provider-catalog-keyring.mjs",
       "desktop/scripts/provider-catalog.mjs",
+      "desktop/scripts/generate-owner-pilot-provider-catalog.mjs",
+      "desktop/scripts/support/private-key-loader.mjs",
       "desktop/src/canonicalJson.ts",
       "desktop/src/jsonContract.ts",
       "desktop/src/main.ts",
@@ -18,7 +20,7 @@
       "desktop/src/semanticVersion.ts",
       "desktop/src/signedCatalog.ts"
     ],
-    "commit": "a40a8f936cc5c7b05d1f337b77bca368d15a3f07",
+    "commit": "4d675454185afdc8f06afb1d02a6f14ff4dd2254",
     "node_version": "24.14.0",
     "repository": "Prolabi-Foundation/prolabi-desktop",
     "validation_mode": "pinned-or-authority-equivalent",
@@ -31,7 +33,7 @@
       "openai"
     ],
     "kill_switch_publication_mode": "owner-pilot-disabled",
-    "max_catalog_lifetime_days": 7,
+    "max_catalog_lifetime_days": 180,
     "minimum_owner_approvals": 1,
     "publication_mode": "owner-pilot-openai",
     "scope": "repository-owner-only"

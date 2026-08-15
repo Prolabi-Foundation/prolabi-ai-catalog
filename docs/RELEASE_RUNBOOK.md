@@ -6,7 +6,7 @@ The owner-only OpenAI pilot is a separate, temporary deployment mode. It does no
 
 ## Owner-only OpenAI pilot
 
-The repository owner may approve a pilot candidate after recording the exact Desktop commit, catalog version, public-key fingerprints, source URLs and timestamps for model/pricing review, payload SHA-256, maximum approved smoke cost, and cleanup result. The candidate must contain only the three OpenAI descriptors accepted by Desktop's `owner-pilot-openai` publication mode and must expire within seven days. At the 2026-08-02 review, the official model pages list [Luna](https://developers.openai.com/api/docs/models/gpt-5.6-luna) (`gpt-5.6-luna`) at USD 1/6, [Terra](https://developers.openai.com/api/docs/models/gpt-5.6-terra) (`gpt-5.6-terra`) at USD 2.50/15, and [Sol](https://developers.openai.com/api/docs/models/gpt-5.6-sol) (`gpt-5.6-sol`) at USD 5/30 per million input/output tokens; re-check those pages immediately before every candidate because the signed payload, not this prose, is the billable authority.
+The repository owner may approve a pilot candidate after recording the exact Desktop commit, catalog version, public-key fingerprints, source URLs and timestamps for model/pricing review, payload SHA-256, maximum approved smoke cost, and cleanup result. The candidate must contain only the three OpenAI descriptors accepted by Desktop's `owner-pilot-openai` publication mode and must expire within exactly 180 days or less. At the 2026-08-02 review, the official model pages list [Luna](https://developers.openai.com/api/docs/models/gpt-5.6-luna) (`gpt-5.6-luna`) at USD 1/6, [Terra](https://developers.openai.com/api/docs/models/gpt-5.6-terra) (`gpt-5.6-terra`) at USD 2.50/15, and [Sol](https://developers.openai.com/api/docs/models/gpt-5.6-sol) (`gpt-5.6-sol`) at USD 5/30 per million input/output tokens; re-check those pages immediately before every candidate because the signed payload, not this prose, is the billable authority.
 
 Desktop may temporarily provide an unpackaged, ephemeral trust harness for local
 solo development. Its keys and catalog are generated in memory, use disposable
@@ -18,8 +18,9 @@ to an owner-pilot or production catalog release.
 Validate and sign with the explicit mode:
 
 ```powershell
+node D:\trusted-source\prolabi-desktop\desktop\scripts\generate-owner-pilot-provider-catalog.mjs --catalog-version YYYY.MM.N --validity-days 180 --output D:\offline-work\pilot.payload.json
 node scripts\validate-with-desktop.mjs --desktop-dir D:\src\prolabi-desktop --payload D:\catalog-work\pilot.payload.json --publication-mode owner-pilot-openai
-node D:\trusted-source\prolabi-desktop\desktop\scripts\provider-catalog.mjs sign --payload D:\offline-work\pilot.payload.json --publication-mode owner-pilot-openai --private-key E:\offline-keys\active.pem --key-id provider-active-YYYY-NN --output D:\offline-work\prolabi-provider-model-catalog-YYYY.MM.N.json
+node D:\trusted-source\prolabi-desktop\desktop\scripts\provider-catalog.mjs sign --payload D:\offline-work\pilot.payload.json --publication-mode owner-pilot-openai --private-key E:\offline-keys\active.pem --prompt-private-key-passphrase --key-id provider-active-YYYY-NN --output D:\offline-work\prolabi-provider-model-catalog-YYYY.MM.N.json
 ```
 
 The active and recovery private keys must be created on separate offline systems and kept on separately encrypted offline media. Only their reviewed public-key records enter Desktop. Never create either private key on a development workstation or in CI.
@@ -50,7 +51,7 @@ Public CI must remain green after the consumer authority changes, and Desktop's 
 
 ## 3. Prepare release data outside Git
 
-Create a new working directory outside both repositories. The payload must use a strictly increasing `YYYY.MM.N` catalog version and a lifetime no longer than 30 days.
+Create a new working directory outside both repositories. The payload must use a strictly increasing `YYYY.MM.N` catalog version and a lifetime no longer than exactly 180 days.
 
 For each of the nine initial mappings, two reviewers independently verify against current official provider documentation:
 
@@ -76,7 +77,7 @@ node scripts\provider-catalog.mjs validate --payload D:\catalog-work\catalog.pay
 Transfer only the reviewed payload to the active-key system. Sign using the canonical Desktop tool from the same pinned source commit. Keep the private-key file outside every repository and create a new output rather than overwriting an old asset.
 
 ```powershell
-node D:\trusted-source\prolabi-desktop\desktop\scripts\provider-catalog.mjs sign --payload D:\offline-work\catalog.payload.json --private-key E:\offline-keys\active.pem --key-id provider-active-YYYY-NN --output D:\offline-work\prolabi-provider-model-catalog-YYYY.MM.N.json
+node D:\trusted-source\prolabi-desktop\desktop\scripts\provider-catalog.mjs sign --payload D:\offline-work\catalog.payload.json --private-key E:\offline-keys\active.pem --prompt-private-key-passphrase --key-id provider-active-YYYY-NN --output D:\offline-work\prolabi-provider-model-catalog-YYYY.MM.N.json
 ```
 
 Return only the signed asset. Securely clear the temporary offline working copy according to the Foundation's key-handling policy.
