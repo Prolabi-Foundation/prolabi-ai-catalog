@@ -13,6 +13,9 @@ Prolabi Desktop is the authority for the catalog schema and publication rules. T
 - The owner-only OpenAI pilot pins three reviewed aliases, IDs, prices, and an exact 180-day maximum lifetime in the Desktop consumer policy.
 - The final immutable owner-only release `provider-model-catalog-v2026.08.2`
   exists; external provider access remains a separate, explicit Desktop control.
+- Its pending paid smoke is one OpenAI-only ceremony containing exactly one
+  successful response and one cancellation under a USD 0.03 total
+  authorization; it is not the production three-provider gate.
 
 ## Local verification
 
