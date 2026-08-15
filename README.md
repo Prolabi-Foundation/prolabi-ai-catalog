@@ -32,7 +32,7 @@ node scripts/validate-with-desktop.mjs --desktop-dir D:\src\prolabi-desktop --pa
 Owner-pilot candidates must opt into the narrower consumer mode:
 
 ```powershell
-node scripts/validate-with-desktop.mjs --desktop-dir D:\src\prolabi-desktop --payload D:\catalog-work\catalog.payload.json --publication-mode owner-pilot-openai
+node scripts/validate-with-desktop.mjs --desktop-dir D:\src\prolabi-desktop --payload D:\catalog-work\catalog.payload.json --publication-mode owner-pilot-openai --evidence D:\catalog-work\owner-pilot.evidence.json
 ```
 
 The consumer checkout must be the pinned commit or a descendant whose authority fingerprint exactly matches policy. Before a coordinated update, calculate the reviewed working-tree fingerprint with `npm run consumer:fingerprint -- --desktop-dir D:\src\prolabi-desktop`; after Desktop commits, the validator recomputes the same value from committed Git blobs. Update the ancestor pin and fingerprint only after reviewing every authority-path diff. Merge this operational update before advancing Desktop's immutable catalog-operations source pin; the later source-pin commit is allowed only while the reviewed authority fingerprint remains unchanged.
@@ -55,7 +55,9 @@ This structural inspection does not replace signature verification by Desktop. F
 
 ## Owner-only pilot boundary
 
-The temporary pilot is limited to the repository owner and OpenAI. It requires one recorded owner approval, a maximum exact 180-day catalog lifetime, two offline-created trust roots in Desktop (active and recovery), and a catalog signed by the active key. This is a deployment scope, not a production-governance waiver: production publication continues to require two independent approvals and all three provider families.
+The temporary pilot is limited to the repository owner and OpenAI. It requires one recorded owner approval, one independently recorded price verification against current official provider documentation, a maximum exact 180-day catalog lifetime, two offline-created trust roots in Desktop (active and recovery), and a catalog signed by the active key. A locally operated review agent may produce the independent verification record for this single-maintainer pilot. This is a deployment scope, not a production-governance waiver: production publication continues to require two independent human approvals and all three provider families.
+
+The bootstrap policy is reviewed annually. Tooling blocks new owner-pilot activations when `governance_review_due_at` is reached, but continues to permit the fail-closed kill switch. Evidence remains outside Git and outside the one-asset Release.
 
 Publishing a signed catalog with the same three descriptors marked `deprecated` and no profile mappings is the pilot kill switch. Desktop treats that verified shape as suspended and disables broker access.
 

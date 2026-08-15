@@ -1,6 +1,7 @@
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 
 import {
   fingerprintConsumerAuthority,
@@ -9,10 +10,12 @@ import {
   readJson,
   requiredAbsolutePath,
 } from './lib/contracts.mjs';
+import { validateOwnerPilotEvidence } from './lib/owner-pilot-evidence.mjs';
 
 const policy = loadPolicy();
 const arguments_ = parseArguments(process.argv.slice(2), [
   'desktop-dir',
+  'evidence',
   'payload',
   'publication-mode',
 ]);
@@ -35,6 +38,29 @@ const desktopCommit = commandOutput('git', [
 ]);
 assertConsumerAuthority(desktopCommit);
 assertDeploymentPolicy(publicationMode);
+const catalogCommit = commandOutput('git', [
+  '-C',
+  fileURLToPath(new URL('..', import.meta.url)),
+  'rev-parse',
+  'HEAD',
+]);
+if (
+  publicationMode === policy.owner_pilot.publication_mode ||
+  publicationMode === policy.owner_pilot.kill_switch_publication_mode
+) {
+  const evidencePath = requiredAbsolutePath(arguments_, 'evidence');
+  validateOwnerPilotEvidence({
+    catalogCommit,
+    desktopCommit,
+    evidencePath,
+    now: new Date(),
+    payloadPath,
+    policy,
+    publicationMode,
+  });
+} else if (arguments_.evidence !== undefined) {
+  throw new Error('Production validation must not use owner-pilot evidence.');
+}
 if (!existsSync(validatorPath) || !existsSync(compiledValidatorDependency)) {
   throw new Error('Desktop must be built before consumer validation.');
 }
