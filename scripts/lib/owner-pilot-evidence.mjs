@@ -65,12 +65,32 @@ export function validateOwnerPilotEvidence(options) {
   } else if (evidence.pricing_verification !== null) {
     throw new Error('Kill-switch evidence must not depend on pricing review.');
   }
+  validateCeremonyOrder(evidence, payload, isActivation);
   return Object.freeze({
     catalogVersion: evidence.catalog_version,
     payloadSha256: evidence.payload_sha256,
     purpose: evidence.purpose,
     governanceReviewOverdue: governance.reviewOverdue,
   });
+}
+
+function validateCeremonyOrder(evidence, payload, isActivation) {
+  if (!isCanonicalTimestamp(payload.published_at)) {
+    throw new Error('Catalog publication timestamp is invalid.');
+  }
+  const publishedAtMs = Date.parse(payload.published_at);
+  const pricingVerifiedAtMs = isActivation
+    ? Date.parse(evidence.pricing_verification.verified_at)
+    : null;
+  for (const approval of evidence.approvals) {
+    const approvedAtMs = Date.parse(approval.approved_at);
+    if (approvedAtMs > publishedAtMs) {
+      throw new Error('Catalog approval must precede catalog publication.');
+    }
+    if (pricingVerifiedAtMs !== null && pricingVerifiedAtMs > approvedAtMs) {
+      throw new Error('Catalog approval must follow pricing verification.');
+    }
+  }
 }
 
 function validActiveKey(value) {

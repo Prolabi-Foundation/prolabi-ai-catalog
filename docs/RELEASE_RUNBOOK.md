@@ -1,14 +1,16 @@
 # Provider catalog release runbook
 
 Status: the final immutable owner-only release `provider-model-catalog-v2026.08.2`
-is published and its paid smoke remains pending. No production catalog or release
-is currently authorized.
+remains historical but is not eligible for the version-2 paid smoke because its
+factual approval followed its declared publication time. The strictly higher
+replacement `2026.08.3` and its paid smoke remain pending. No production catalog
+or release is currently authorized.
 
 The owner-only OpenAI pilot remains a narrower technical deployment mode. Pilot and production share the global unanimous governance policy; the current eligible set is only `asnielrod`, so every catalog requires one human approval.
 
 ## Owner-only OpenAI pilot
 
-The repository owner may approve a pilot candidate after recording the exact Desktop commit, catalog version, public-key fingerprints, source URLs and timestamps for model/pricing review, payload SHA-256, maximum approved smoke cost, and cleanup result. One independent verification record against current official provider documentation is also required; a locally operated review agent may produce it, but it is technical evidence rather than another approval. New evidence uses `prolabi-owner-pilot-release-evidence` version 2, remains outside Git and the Release, matches the exact payload bytes and is less than 24 hours old. The advisory governance review on 2028-08-14 does not block activation or change 1/1 approval. The candidate must contain only the three OpenAI descriptors accepted by Desktop's `owner-pilot-openai` publication mode and must expire within exactly 180 days or less. At the 2026-08-14 verification, the official model pages list [Luna](https://developers.openai.com/api/docs/models/gpt-5.6-luna) (`gpt-5.6-luna`) at USD 0.20/1.20, [Terra](https://developers.openai.com/api/docs/models/gpt-5.6-terra) (`gpt-5.6-terra`) at USD 2/12, and [Sol](https://developers.openai.com/api/docs/models/gpt-5.6-sol) (`gpt-5.6-sol`) at USD 5/30 per million standard input/output tokens; re-check those pages immediately before every candidate because the signed payload, not this prose, is the billable authority.
+The repository owner may approve a pilot candidate after recording the exact Desktop commit, catalog version, public-key fingerprints, source URLs and timestamps for model/pricing review, payload SHA-256 and maximum approved smoke cost. One independent verification record against current official provider documentation is also required; a locally operated review agent may produce it, but it is technical evidence rather than another approval. New evidence uses `prolabi-owner-pilot-release-evidence` version 2, remains outside Git and the Release, matches the exact payload bytes and is less than 24 hours old. It enforces `pricing verification <= 1/1 approval <= payload published_at`; signing occurs only after that approval and a release becomes final only at or after `published_at`. The advisory governance review on 2028-08-14 does not block activation or change 1/1 approval. The candidate must contain only the three OpenAI descriptors accepted by Desktop's `owner-pilot-openai` publication mode and must expire within exactly 180 days or less. At the 2026-08-14 verification, the official model pages list [Luna](https://developers.openai.com/api/docs/models/gpt-5.6-luna) (`gpt-5.6-luna`) at USD 0.20/1.20, [Terra](https://developers.openai.com/api/docs/models/gpt-5.6-terra) (`gpt-5.6-terra`) at USD 2/12, and [Sol](https://developers.openai.com/api/docs/models/gpt-5.6-sol) (`gpt-5.6-sol`) at USD 5/30 per million standard input/output tokens; re-check those pages immediately before every candidate because the signed payload, not this prose, is the billable authority.
 
 Desktop accepts provider catalogs only through the final immutable GitHub Release
 source and the compiled public keyring. Loopback transports and synthetic catalog
@@ -19,7 +21,7 @@ or production catalog release.
 Validate and sign with the explicit mode:
 
 ```powershell
-node D:\trusted-source\prolabi-desktop\desktop\scripts\generate-owner-pilot-provider-catalog.mjs --catalog-version YYYY.MM.N --validity-days 180 --output D:\offline-work\pilot.payload.json
+node D:\trusted-source\prolabi-desktop\desktop\scripts\generate-owner-pilot-provider-catalog.mjs --catalog-version YYYY.MM.N --published-at YYYY-MM-DDTHH:mm:ss.sssZ --validity-days 180 --output D:\offline-work\pilot.payload.json
 node scripts\validate-with-desktop.mjs --desktop-dir D:\src\prolabi-desktop --payload D:\catalog-work\pilot.payload.json --publication-mode owner-pilot-openai --evidence D:\catalog-work\owner-pilot.evidence.json
 node D:\trusted-source\prolabi-desktop\desktop\scripts\provider-catalog.mjs sign --payload D:\offline-work\pilot.payload.json --publication-mode owner-pilot-openai --private-key E:\offline-keys\active.pem --prompt-private-key-passphrase --key-id provider-active-YYYY-NN --output D:\offline-work\prolabi-provider-model-catalog-YYYY.MM.N.json
 ```
@@ -52,9 +54,9 @@ Public CI must remain green after the consumer authority changes, and Desktop's 
 
 ## 3. Prepare release data outside Git
 
-Create a new working directory outside both repositories. The payload must use a strictly increasing `YYYY.MM.N` catalog version and a lifetime no longer than exactly 180 days.
+Create a new working directory outside both repositories. The payload must use a strictly increasing `YYYY.MM.N` catalog version and a lifetime no longer than exactly 180 days. Its required `published_at` is a future, explicitly scheduled UTC instant: it is the earliest time at which the draft may become final, not the time at which the payload happens to be generated.
 
-For each of the nine initial mappings, produce one independent technical verification against current official provider documentation:
+For each mapping in the candidate, produce one independent technical verification against current official provider documentation: exactly three OpenAI mappings for `owner-pilot-openai`, or all nine mappings across the three providers for production.
 
 - exact API model ID and availability;
 - API contract supported by Desktop;
@@ -73,6 +75,8 @@ npm run build
 node scripts\provider-catalog.mjs validate --payload D:\catalog-work\catalog.payload.json
 ```
 
+Create and validate the version-2 owner-pilot evidence against those exact payload bytes and repository commits. The independent pricing timestamp must be at or before every unanimous approval timestamp, and every approval must be at or before `payload.published_at`. Record the owner approval 1/1 now; do not transfer the payload to the signing system until this validation passes.
+
 ## 4. Sign offline
 
 Transfer only the reviewed payload to the active-key system. Sign using the canonical Desktop tool from the same pinned source commit. Keep the private-key file outside every repository and create a new output rather than overwriting an old asset.
@@ -85,14 +89,14 @@ Return only the signed asset. Securely clear the temporary offline working copy 
 
 ## 5. Inspect and publish
 
-On the publication system, inspect the candidate and extract a new review copy:
+On the publication system, inspect the signed candidate and extract a new review copy:
 
 ```powershell
 node scripts\inspect-release-candidate.mjs --asset D:\catalog-work\prolabi-provider-model-catalog-YYYY.MM.N.json --tag provider-model-catalog-vYYYY.MM.N --payload-output D:\catalog-work\review.payload.json
-node scripts\validate-with-desktop.mjs --desktop-dir D:\src\prolabi-desktop --payload D:\catalog-work\review.payload.json
+node scripts\validate-with-desktop.mjs --desktop-dir D:\src\prolabi-desktop --payload D:\catalog-work\review.payload.json --publication-mode owner-pilot-openai --evidence D:\catalog-work\owner-pilot.evidence.json
 ```
 
-The owner records the unanimous 1/1 approval bound to the catalog version, payload SHA-256 and pinned governance commit. Create a draft release with the exact tag and exactly one asset. Confirm the uploaded asset's GitHub digest and size match before making the release final and immutable. Desktop rejects drafts, prereleases, mutable releases, missing digests, additional/mismatched assets, invalid signatures, approval drift and version drift.
+Confirm that the extracted payload SHA-256 still matches the already approved payload. Create a draft release with the exact tag and exactly one asset. Confirm the uploaded asset's GitHub digest and size match, wait until `payload.published_at`, and only then make the release final and immutable. Desktop rejects drafts, prereleases, mutable releases, missing digests, additional/mismatched assets, invalid signatures, approval drift and version drift.
 
 Do not republish altered bytes under an existing version. Recovery uses a higher catalog version or a Desktop keyring revocation, never release mutation.
 
@@ -102,7 +106,7 @@ From a clean packaged Desktop install with no credentials:
 
 1. Refresh and verify version, expiry, key ID, payload hash, and absence of broker execution.
 2. Run negative checks for rollback, unknown key, altered asset, bad digest, mutable release, and expired catalog.
-3. Execute the capped manual paid smoke for OpenAI, Anthropic, and Gemini using separate low-limit test credentials, as defined in Desktop operations documentation.
+3. For `owner-pilot-openai`, execute only the single capped OpenAI ceremony defined in Desktop operations documentation. The later production catalog separately requires capped smokes for OpenAI, Anthropic, and Gemini with distinct low-limit test credentials.
 4. Complete Windows/macOS packaging and the AI-2 exit evidence against the same clean source commit, candidate, and catalog.
 5. Remove test credentials and disable external-provider access after validation.
 
