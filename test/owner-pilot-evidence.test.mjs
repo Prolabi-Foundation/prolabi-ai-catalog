@@ -42,6 +42,53 @@ test('owner-pilot evidence binds current independent pricing to exact payload', 
   });
 });
 
+test('owner-pilot evidence enforces review, approval, and publication order', () => {
+  withFixture(({ evidence, evidencePath, payloadPath, writeEvidence }) => {
+    evidence.approvals[0].approved_at = '2026-08-14T17:45:00.000Z';
+    writeEvidence();
+    assert.doesNotThrow(() => validateOwnerPilotEvidence({
+      catalogCommit: commit,
+      desktopCommit: commit,
+      evidencePath,
+      now,
+      payloadPath,
+      policy,
+      publicationMode: 'owner-pilot-openai',
+    }));
+
+    evidence.approvals[0].approved_at = '2026-08-14T17:45:00.001Z';
+    writeEvidence();
+    assert.throws(
+      () => validateOwnerPilotEvidence({
+        catalogCommit: commit,
+        desktopCommit: commit,
+        evidencePath,
+        now,
+        payloadPath,
+        policy,
+        publicationMode: 'owner-pilot-openai',
+      }),
+      /approval must precede catalog publication/u,
+    );
+
+    evidence.approvals[0].approved_at = '2026-08-14T17:30:00.000Z';
+    evidence.pricing_verification.verified_at = '2026-08-14T17:30:00.001Z';
+    writeEvidence();
+    assert.throws(
+      () => validateOwnerPilotEvidence({
+        catalogCommit: commit,
+        desktopCommit: commit,
+        evidencePath,
+        now,
+        payloadPath,
+        policy,
+        publicationMode: 'owner-pilot-openai',
+      }),
+      /approval must follow pricing verification/u,
+    );
+  });
+});
+
 test('owner-pilot activation rejects stale evidence and reports overdue governance', () => {
   withFixture(({ evidence, evidencePath, payloadPath, writeEvidence }) => {
     evidence.pricing_verification.verified_at = '2026-08-13T17:59:59.999Z';
@@ -62,13 +109,20 @@ test('owner-pilot activation rejects stale evidence and reports overdue governan
     evidence.pricing_verification.sources = evidence.pricing_verification.sources.map(
       (source) => ({ ...source, accessed_at: '2028-08-14T00:00:00.000Z' }),
     );
+    evidence.approvals[0].approved_at = '2028-08-14T00:01:00.000Z';
+    const payload = JSON.parse(readFileSync(payloadPath, 'utf8'));
+    payload.published_at = '2028-08-14T00:03:00.000Z';
+    writeFileSync(payloadPath, `${JSON.stringify(payload)}\n`);
+    evidence.payload_sha256 = createHash('sha256')
+      .update(readFileSync(payloadPath))
+      .digest('hex');
     writeEvidence();
     assert.equal(
       validateOwnerPilotEvidence({
         catalogCommit: commit,
         desktopCommit: commit,
         evidencePath,
-        now: new Date('2028-08-14T00:00:00.000Z'),
+        now: new Date('2028-08-14T00:02:00.000Z'),
         payloadPath,
         policy,
         publicationMode: 'owner-pilot-openai',
@@ -181,6 +235,7 @@ function withFixture(callback) {
       catalog_version: '2026.08.2',
       models,
       profiles: models.map((model) => ({ model_id: model.id })),
+      published_at: '2026-08-14T17:45:00.000Z',
     };
     writeFileSync(payloadPath, `${JSON.stringify(payload)}\n`);
     const evidence = {
