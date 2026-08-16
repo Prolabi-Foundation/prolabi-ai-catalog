@@ -12,8 +12,13 @@ Prolabi Desktop is the authority for the catalog schema and publication rules. T
   outside both repositories.
 - The owner-only OpenAI pilot pins three reviewed aliases, IDs, prices, and an exact 180-day maximum lifetime in the Desktop consumer policy.
 - The final immutable owner-only release `provider-model-catalog-v2026.08.2`
-  exists; external provider access remains a separate, explicit Desktop control.
-- Its pending paid smoke is one OpenAI-only ceremony containing exactly one
+  remains historical. Its factual approval followed the payload's declared
+  publication time, so version-2 evidence correctly makes it ineligible for the
+  paid smoke; it will not be altered or deleted.
+- `provider-model-catalog-v2026.08.3` is the next owner-only candidate. It must
+  be price-verified and approved 1/1 before offline signing, then published no
+  earlier than its explicit `published_at` instant.
+- The still-pending paid smoke is one OpenAI-only ceremony containing exactly one
   successful response and one cancellation under a USD 0.03 total
   authorization; it is not the production three-provider gate.
 
@@ -59,7 +64,7 @@ This structural inspection does not replace signature verification by Desktop. F
 
 ## Owner-only pilot boundary
 
-The pilot deployment mode is limited to the repository owner and OpenAI. It requires the same unanimous catalog approval used for production, one independently recorded price verification against current official provider documentation, a maximum exact 180-day catalog lifetime, two offline-created trust roots in Desktop (active and recovery), and one catalog signature from the active key. A locally operated review agent may produce the technical verification record. Production still requires its separate nine-model catalog and all three provider families; only the human-approval policy is shared.
+The pilot deployment mode is limited to the repository owner and OpenAI. It requires the same unanimous catalog approval used for production, one independently recorded price verification against current official provider documentation, a maximum exact 180-day catalog lifetime, two offline-created trust roots in Desktop (active and recovery), and one catalog signature from the active key. A locally operated review agent may produce the technical verification record. Version-2 evidence enforces the order `pricing verification <= 1/1 approval <= payload published_at`; signing follows approval and the final release follows `published_at`. Production still requires its separate nine-model catalog and all three provider families; only the human-approval policy is shared.
 
 The single-maintainer policy is reviewed on 2028-08-14. That review is advisory and never changes or blocks the 1/1 approval rule; only an explicit versioned policy change can do so. Evidence remains outside Git and outside the one-asset Release.
 
